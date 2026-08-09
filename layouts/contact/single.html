@@ -1,0 +1,35 @@
+{{ define "main" }}
+  <article class="contact-shell" aria-labelledby="contact-title">
+    <header class="contact-hero">
+      <p class="eyebrow">Contact</p>
+      <h1 id="contact-title">Let’s make the system easier to work in.</h1>
+      <div class="contact-introduction">{{ .Content }}</div>
+      <a class="contact-email" href="mailto:{{ site.Params.contact.email }}" aria-label="Email Marc at {{ site.Params.contact.email }}">
+        <span>Email Marc at {{ site.Params.contact.email }}</span>
+        <span aria-hidden="true">↘</span>
+      </a>
+    </header>
+
+    <section class="contact-topics numbered-section" aria-labelledby="contact-topics-title">
+      <p class="section-number" aria-hidden="true">01</p>
+      <div>
+        <h2 id="contact-topics-title">Good reasons to reach out</h2>
+        <ul>
+          <li><span>Organizational challenge</span><span>Untangle how decisions, structures, and ways of working shape performance.</span></li>
+          <li><span>Speaking</span><span>Bring a candid, evidence-led perspective to a team or event.</span></li>
+          <li><span>Teaching</span><span>Explore practical learning around organizational effectiveness.</span></li>
+          <li><span>Professional conversation</span><span>Compare notes on the systems that help people do their best work.</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="contact-social numbered-section" aria-labelledby="contact-social-title">
+      <p class="section-number" aria-hidden="true">02</p>
+      <div>
+        <h2 id="contact-social-title">Elsewhere</h2>
+        <p>Follow my public work and ongoing thinking.</p>
+        {{ partial "social-links.html" (dict "label" (printf "%s’s professional profiles" site.Params.author.name)) }}
+      </div>
+    </section>
+  </article>
+{{ end }}

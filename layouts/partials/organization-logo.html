@@ -1,0 +1,9 @@
+{{ with .Page.Params.organization_logo }}
+  {{ $logo := resources.Get . }}
+  <img
+    class="organization-logo {{ $.Class }}"
+    src="{{ $logo.RelPermalink }}"
+    width="{{ $logo.Width }}"
+    height="{{ $logo.Height }}"
+    alt="{{ $.Page.Params.organization }}">
+{{ end }}

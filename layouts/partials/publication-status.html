@@ -1,0 +1,5 @@
+{{ $status := "review" }}
+{{ with .Params.publication }}
+  {{ $status = .status | default "review" }}
+{{ end }}
+{{ return $status }}

@@ -1,0 +1,23 @@
+<section class="shell-hero" aria-labelledby="shell-title">
+  <p class="eyebrow">{{ site.Title }}</p>
+  <h1 id="shell-title">{{ site.Params.author.descriptor }} <span>{{ site.Params.author.descriptorAccent }}</span></h1>
+  <p class="shell-thesis">Helping organizations scale without losing the people who make them work.</p>
+  <div class="shell-actions" aria-label="Primary actions">
+    <a href="/work/">Explore my work <span aria-hidden="true">↘</span></a>
+    <a href="/contact/">Start a conversation <span aria-hidden="true">→</span></a>
+  </div>
+</section>
+
+<section class="shell-index numbered-section" aria-labelledby="explore-title">
+  <p class="section-number" aria-hidden="true">01</p>
+  <div>
+    <h2 id="explore-title">Explore</h2>
+    <ul>
+      {{ range site.Menus.main }}
+        {{ if ne .Name "Home" }}
+          <li><a href="{{ .URL }}"><span>{{ .Name }}</span><span aria-hidden="true">↗</span></a></li>
+        {{ end }}
+      {{ end }}
+    </ul>
+  </div>
+</section>

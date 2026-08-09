@@ -1,0 +1,45 @@
+{{ define "main" }}
+  <article class="work-case">
+    <header class="work-case-hero">
+      <p class="eyebrow">{{ .Params.organization }} · {{ .Params.case_label }}</p>
+      {{ partial "organization-logo.html" (dict "Page" . "Class" "work-case-organization-logo") }}
+      <h1>{{ .Title }}</h1>
+      <p class="work-case-deck">{{ .Description }}</p>
+    </header>
+
+    <dl class="work-case-summary" aria-label="Case boundaries">
+      <div>
+        <dt>Context</dt>
+        <dd>{{ .Params.case_summary.context }}</dd>
+      </div>
+      <div>
+        <dt>Contribution</dt>
+        <dd>{{ .Params.case_summary.contribution }}</dd>
+      </div>
+      <div>
+        <dt>Collaboration</dt>
+        <dd>{{ .Params.case_summary.collaboration }}</dd>
+      </div>
+    </dl>
+
+    <div class="work-case-progression">
+      {{ range $stageIndex, $stage := .Params.stages }}
+        {{ $stageNumber := add $stageIndex 1 }}
+        <section aria-labelledby="case-stage-{{ $stageNumber }}">
+          <div class="case-stage-marker" aria-hidden="true">
+            <span>{{ printf "%02d" $stageNumber }}</span>
+          </div>
+          <div class="case-stage-copy">
+            <p class="case-scope">{{ $stage.scope }}</p>
+            <h2 id="case-stage-{{ $stageNumber }}">{{ $stage.title }}</h2>
+            {{ range $stage.paragraphs }}<p>{{ . }}</p>{{ end }}
+          </div>
+        </section>
+      {{ end }}
+    </div>
+
+    {{ with .Content }}
+      <div class="work-case-body">{{ . }}</div>
+    {{ end }}
+  </article>
+{{ end }}

@@ -1,0 +1,7 @@
+{{ $page := .Page }}
+<header class="editorial-index-header">
+  <p class="eyebrow">{{ .Eyebrow }}</p>
+  <h1>{{ $page.Title }}</h1>
+  <p class="editorial-index-deck">{{ $page.Description }}</p>
+  {{ with $page.Content }}<div class="editorial-index-introduction">{{ . }}</div>{{ end }}
+</header>

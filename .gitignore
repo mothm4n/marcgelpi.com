@@ -1,0 +1,9 @@
+**/.DS_Store
+/public/
+/resources/_gen/
+/.hugo_build.lock
+/hugo_stats.json
+/.playwright-cli/
+/node_modules/
+/.site-build.*/
+/docs/

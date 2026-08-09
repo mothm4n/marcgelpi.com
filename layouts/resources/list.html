@@ -1,0 +1,16 @@
+{{ define "main" }}
+  <article class="resources-index">
+    {{ partial "editorial-index-header.html" (dict "Page" . "Eyebrow" "Tools for the work") }}
+
+    <ol class="resources-list editorial-list">
+      {{ range .RegularPages.ByWeight }}
+        <li>{{ partial "editorial-index-item.html" (dict
+          "Page" .
+          "AriaLabel" (printf "Use %s" (.Title | lower))
+          "Meta" .Params.resource_label
+          "MetaClass" "resource-type"
+        ) }}</li>
+      {{ end }}
+    </ol>
+  </article>
+{{ end }}

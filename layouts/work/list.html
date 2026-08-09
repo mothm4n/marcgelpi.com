@@ -1,0 +1,17 @@
+{{ define "main" }}
+  <article class="work-index">
+    {{ partial "editorial-index-header.html" (dict "Page" . "Eyebrow" "Work") }}
+
+    <ol class="work-case-list editorial-list">
+      {{ range .RegularPages.ByWeight }}
+        <li>{{ partial "editorial-index-item.html" (dict
+          "Page" .
+          "AriaLabel" (printf "Read the %s case: %s" .Params.organization .Title)
+          "Meta" .Params.organization
+          "MetaClass" "case-organization"
+          "MetaImage" .Params.organization_logo
+        ) }}</li>
+      {{ end }}
+    </ol>
+  </article>
+{{ end }}

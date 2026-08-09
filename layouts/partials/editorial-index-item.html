@@ -1,0 +1,10 @@
+{{ $page := .Page }}
+<a href="{{ $page.RelPermalink }}" aria-label="{{ .AriaLabel }}">
+  {{ with .MetaImage }}
+    {{ partial "organization-logo.html" (dict "Page" $page "Class" (printf "%s-logo" $.MetaClass)) }}
+  {{ else }}
+    <span class="{{ .MetaClass }}">{{ .Meta }}</span>
+  {{ end }}
+  <strong>{{ $page.Title }}</strong>
+  <span aria-hidden="true">↘</span>
+</a>

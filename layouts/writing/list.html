@@ -1,0 +1,17 @@
+{{ define "main" }}
+  <article class="writing-index">
+    {{ partial "editorial-index-header.html" (dict "Page" . "Eyebrow" "Ideas in practice") }}
+
+    <ol class="writing-archive editorial-list" reversed>
+      {{ range .RegularPages.ByDate.Reverse }}
+        <li>
+          <a href="{{ .RelPermalink }}">
+            {{ partial "editorial-date.html" .Date }}
+            <strong>{{ .Title }}</strong>
+            <span aria-hidden="true">↘</span>
+          </a>
+        </li>
+      {{ end }}
+    </ol>
+  </article>
+{{ end }}

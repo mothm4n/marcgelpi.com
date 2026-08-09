@@ -1,0 +1,6 @@
+<article class="page-shell">
+  <p class="eyebrow">{{ site.Title }}</p>
+  <h1>{{ .Title }}</h1>
+  {{ with .Description }}<p class="page-deck">{{ . }}</p>{{ end }}
+  {{ with .Content }}<div class="prose">{{ . }}</div>{{ end }}
+</article>

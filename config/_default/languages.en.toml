@@ -1,0 +1,32 @@
+disabled = false
+locale = "en"
+label = "English"
+weight = 1
+title = "Marc Gelpí"
+
+[params]
+  displayName = "English"
+  isoCode = "en"
+  rtl = false
+  dateFormat = "2 January 2006"
+  careerDateFormat = "January 2006"
+  openGraphLocale = "en_GB"
+  description = "People-first organizational effectiveness and ways of working."
+  copyright = "© { year } Marc Gelpí"
+
+[params.author]
+  name = "Marc Gelpí"
+  descriptor = "People-First Organizational Effectiveness"
+  descriptorAccent = "& Ways of Working Leader"
+
+[params.portrait]
+  image = "images/home.jpeg"
+  alt = "Marc Gelpí smiling during a conversation"
+
+[params.contact]
+  email = "hello@marcgelpi.com"
+  linkedin = "https://www.linkedin.com/in/gelpi/"
+  github = "https://github.com/mothm4n"
+
+[params.writing]
+  longReadWordThreshold = 1200

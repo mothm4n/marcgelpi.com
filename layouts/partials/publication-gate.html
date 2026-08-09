@@ -1,0 +1,55 @@
+{{ $requiresApproval := partial "publication-requires-approval.html" . }}
+{{ if and hugo.IsProduction $requiresApproval }}
+  {{ $publication := dict }}
+  {{ $status := partial "publication-status.html" . }}
+  {{ with .Params.publication }}
+    {{ $publication = . }}
+  {{ end }}
+  {{ if ne $status "approved" }}
+    {{ errorf "Editorial page %q cannot be published with publication.status %q" .Path $status }}
+  {{ end }}
+
+  {{ if not (index $publication "reviewed_by") }}
+    {{ errorf "Approved editorial page %q requires publication.reviewed_by" .Path }}
+  {{ end }}
+  {{ if not (index $publication "reviewed_at") }}
+    {{ errorf "Approved editorial page %q requires publication.reviewed_at" .Path }}
+  {{ end }}
+  {{ if ne (index $publication "privacy_reviewed") true }}
+    {{ errorf "Approved editorial page %q requires publication.privacy_reviewed: true" .Path }}
+  {{ end }}
+
+  {{ if and .IsPage (eq .RelPermalink "/about/") (ne .Params.career_history_complete true) }}
+    {{ errorf "Approved About page %q requires career_history_complete: true" .Path }}
+  {{ end }}
+
+  {{ if and .IsPage (eq .Section "work") }}
+    {{ range slice "attribution_reviewed" "collaboration_reviewed" "identifiability_reviewed" }}
+      {{ if ne (index $publication .) true }}
+        {{ errorf "Approved case %q requires publication.%s: true" $.Path . }}
+      {{ end }}
+    {{ end }}
+
+    {{ $namingPermission := index $publication "naming_permission" }}
+    {{ if not (in (slice "named-approved" "anonymized") $namingPermission) }}
+      {{ errorf "Approved case %q requires publication.naming_permission to be named-approved or anonymized" .Path }}
+    {{ end }}
+
+    {{ $claims := index $publication "claims" }}
+    {{ if not $claims }}
+      {{ errorf "Approved case %q requires at least one classified publication claim" .Path }}
+    {{ else }}
+      {{ range $claims }}
+        {{ if not .claim }}
+          {{ errorf "Approved case %q has a publication claim without claim text" $.Path }}
+        {{ end }}
+        {{ if not .source }}
+          {{ errorf "Approved case %q has a publication claim without a source or review note" $.Path }}
+        {{ end }}
+        {{ if not (in (slice "public-fact" "recollection" "inference") .basis) }}
+          {{ errorf "Approved case %q has a publication claim with unsupported basis %q" $.Path .basis }}
+        {{ end }}
+      {{ end }}
+    {{ end }}
+  {{ end }}
+{{ end }}

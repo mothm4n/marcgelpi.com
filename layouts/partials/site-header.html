@@ -1,0 +1,20 @@
+<header class="site-header">
+  <a class="site-mark" href="/" aria-label="{{ site.Params.author.name }}, home">
+    <span aria-hidden="true">MG</span>
+  </a>
+
+  <nav class="desktop-navigation" aria-label="Primary" data-primary-navigation>
+    <ul>
+      {{ partial "navigation-items.html" (dict "page" . "menu" site.Menus.main) }}
+    </ul>
+  </nav>
+
+  <details class="mobile-navigation" data-mobile-navigation>
+    <summary>Menu <span aria-hidden="true">↘</span></summary>
+    <nav aria-label="Mobile">
+      <ul>
+        {{ partial "navigation-items.html" (dict "page" . "menu" site.Menus.main) }}
+      </ul>
+    </nav>
+  </details>
+</header>

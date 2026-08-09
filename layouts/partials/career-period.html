@@ -1,0 +1,9 @@
+{{ $start := time.AsTime (printf "%s-01" .start) -}}
+<time datetime="{{ .start }}">{{ $start.Format site.Params.careerDateFormat }}</time>
+<span aria-hidden="true">—</span>
+{{ with .end -}}
+  {{ $end := time.AsTime (printf "%s-01" .) -}}
+  <time datetime="{{ . }}">{{ $end.Format site.Params.careerDateFormat }}</time>
+{{- else -}}
+  <span>Current</span>
+{{- end }}

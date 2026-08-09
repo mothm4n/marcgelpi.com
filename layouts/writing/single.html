@@ -1,0 +1,36 @@
+{{ define "main" }}
+  <article class="writing-article">
+    <header class="writing-article-header">
+      <p class="eyebrow">Writing</p>
+      <h1>{{ .Title }}</h1>
+      <p class="writing-article-deck">{{ .Description }}</p>
+      <p class="writing-article-meta">
+        {{ partial "editorial-date.html" .Date }}
+        <span aria-hidden="true">·</span>
+        <span>{{ .ReadingTime }} min read</span>
+      </p>
+    </header>
+
+    {{ if ge .WordCount site.Params.writing.longReadWordThreshold }}
+      <nav class="writing-toc" aria-label="On this page">
+        <p>On this page</p>
+        {{ .TableOfContents }}
+      </nav>
+    {{ end }}
+
+    <div class="writing-reading-column">
+      {{ if .Truncated }}
+        <section class="writing-first-layer" data-article-first-layer aria-labelledby="short-version-title">
+          <h2 id="short-version-title">The short version</h2>
+          {{ .Summary }}
+        </section>
+        <details class="writing-depth">
+          <summary>Go deeper</summary>
+          <div class="writing-depth-content">{{ .ContentWithoutSummary }}</div>
+        </details>
+      {{ else }}
+        <div class="writing-body" data-article-first-layer>{{ .Content }}</div>
+      {{ end }}
+    </div>
+  </article>
+{{ end }}

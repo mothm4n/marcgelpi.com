@@ -1,0 +1,67 @@
+{{ define "main" }}
+  {{ $durationMinutes := .Params.duration_minutes }}
+  <article class="resource-sheet">
+    <header class="resource-hero">
+      <span class="resource-hero-mark" aria-hidden="true">{{ $durationMinutes }}</span>
+      <p class="eyebrow">{{ .Params.resource_label }}</p>
+      <h1>{{ .Title }}</h1>
+      <p class="resource-deck">{{ .Description }}</p>
+      <p class="resource-meta">{{ $durationMinutes }} minutes · {{ .Params.audience }}</p>
+      <a class="text-link" href="#worksheet" aria-label="Start the diagnosis">Start the diagnosis <span aria-hidden="true">↘</span></a>
+    </header>
+
+    <section class="resource-setup numbered-section" aria-labelledby="resource-setup-title">
+      <p class="section-number" aria-hidden="true">00</p>
+      <div>
+        <h2 id="resource-setup-title">Before you begin</h2>
+        <p>Choose one recurring organizational problem. Describe it as something observable—not as a diagnosis or a solution. Keep one example in mind as you move through the five lenses.</p>
+        <p>The aim is not to score the organization. It is to notice a pattern worth investigating before prescribing a framework.</p>
+      </div>
+    </section>
+
+    <section id="worksheet" class="resource-worksheet" aria-labelledby="worksheet-title">
+      <header class="numbered-section">
+        <p class="section-number" aria-hidden="true">01</p>
+        <div>
+          <h2 id="worksheet-title">Five lenses</h2>
+          <p>Capture short observations and the evidence behind them. If you do not know an answer, write down what would help you learn it.</p>
+        </div>
+      </header>
+
+      <ol>
+        {{ range $lensIndex, $lens := .Params.lenses }}
+          {{ $lensNumber := add $lensIndex 1 }}
+          <li>
+            <article aria-labelledby="diagnostic-lens-{{ $lensNumber }}">
+              <p class="diagnostic-lens-number" aria-hidden="true">{{ printf "%02d" $lensNumber }}</p>
+              <div>
+                <h3 id="diagnostic-lens-{{ $lensNumber }}">{{ $lens.name }}</h3>
+                <p class="diagnostic-lens-prompt">{{ $lens.prompt }}</p>
+                <ul>
+                  {{ range $lens.questions }}<li>{{ . }}</li>{{ end }}
+                </ul>
+                <p class="diagnostic-note-line" aria-hidden="true">Observation</p>
+              </div>
+            </article>
+          </li>
+        {{ end }}
+      </ol>
+    </section>
+
+    <section class="resource-experiment numbered-section" aria-labelledby="resource-experiment-title">
+      <p class="section-number" aria-hidden="true">02</p>
+      <div>
+        <h2 id="resource-experiment-title">Turn observation into a small experiment</h2>
+        <p>Choose one pattern with observable evidence. Define the smallest useful change and the signal that would help you decide what to do next.</p>
+        <dl>
+          <div><dt>Pattern observed</dt><dd>What keeps happening?</dd></div>
+          <div><dt>Observable evidence</dt><dd>What have you seen, heard, or measured?</dd></div>
+          <div><dt>Small experiment</dt><dd>What is the least disruptive change worth trying?</dd></div>
+          <div><dt>Learning signal</dt><dd>What would indicate movement or reveal a mistaken assumption?</dd></div>
+          <div><dt>Review date</dt><dd>When will you inspect the evidence together?</dd></div>
+        </dl>
+        <button class="resource-print" type="button" onclick="window.print()">Print or save as PDF</button>
+      </div>
+    </section>
+  </article>
+{{ end }}

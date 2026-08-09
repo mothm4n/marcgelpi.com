@@ -1,0 +1,4 @@
+{{ $page := .page }}
+{{ range .menu }}
+  <li><a href="{{ .URL }}"{{ if $page.IsMenuCurrent "main" . }} aria-current="page"{{ end }}>{{ .Name }}</a></li>
+{{ end }}

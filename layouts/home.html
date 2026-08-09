@@ -1,0 +1,8 @@
+{{ define "main" }}
+  {{ $revisionApproved := partial "homepage-revision-approved.html" . }}
+  {{ if and hugo.IsProduction (not $revisionApproved) }}
+    {{ partial "home-approved.html" . }}
+  {{ else }}
+    {{ partial "home-editorial.html" . }}
+  {{ end }}
+{{ end }}

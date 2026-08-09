@@ -1,0 +1,10 @@
+{{ $approved := false }}
+{{ with .Params.homepage_revision }}
+  {{ $approved = and
+    (eq (.status | default "review") "approved")
+    (ne (.reviewed_by | default "") "")
+    (ne (.reviewed_at | default "") "")
+    (eq .privacy_reviewed true)
+  }}
+{{ end }}
+{{ return $approved }}
