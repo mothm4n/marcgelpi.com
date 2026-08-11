@@ -14,6 +14,19 @@ acceptance_fail() {
   exit 1
 }
 
+acceptance_contains() {
+  local pattern=$1
+  local path=$2
+
+  if command -v rg >/dev/null 2>&1; then
+    rg --quiet "$pattern" "$path"
+  elif [[ -d "$path" ]]; then
+    grep -ERq "$pattern" "$path"
+  else
+    grep -Eq "$pattern" "$path"
+  fi
+}
+
 acceptance_publication_record_is_approved() {
   local data_file=$1
   local record=$2

@@ -13,18 +13,18 @@ bash "$acceptance_repo_root/scripts/build-production.sh" "$production_site" >/de
 conversation_cta_data="$acceptance_repo_root/data/conversation-ctas.yaml"
 
 if acceptance_publication_record_is_approved "$conversation_cta_data" "about"; then
-  rg --quiet "A shared question\?" "$production_site/about/index.html" || \
+  acceptance_contains "A shared question\?" "$production_site/about/index.html" || \
     acceptance_fail "approved About conversation copy is missing from production"
-elif rg --quiet "A shared question\?" "$production_site/about/index.html"; then
+elif acceptance_contains "A shared question\?" "$production_site/about/index.html"; then
   acceptance_fail "unapproved About conversation copy entered production"
 fi
 
 for production_case in adevinta protected-autonomy preparing-to-scale; do
   production_case_page="$production_site/work/$production_case/index.html"
   if acceptance_publication_record_is_approved "$conversation_cta_data" "work"; then
-    rg --quiet "Recognize the pattern\?" "$production_case_page" || \
+    acceptance_contains "Recognize the pattern\?" "$production_case_page" || \
       acceptance_fail "approved Work conversation copy is missing from $production_case"
-  elif rg --quiet "Recognize the pattern\?" "$production_case_page"; then
+  elif acceptance_contains "Recognize the pattern\?" "$production_case_page"; then
     acceptance_fail "unapproved Work conversation copy entered $production_case"
   fi
 done

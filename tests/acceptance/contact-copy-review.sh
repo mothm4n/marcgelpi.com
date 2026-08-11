@@ -12,9 +12,9 @@ bash "$acceptance_repo_root/scripts/build-production.sh" "$production_site" >/de
 
 contact_actions_data="$acceptance_repo_root/data/contact-actions.yaml"
 if acceptance_publication_record_is_approved "$contact_actions_data" "copy_email"; then
-  rg --quiet "Copy email" "$production_site/contact/index.html" || \
+  acceptance_contains "Copy email" "$production_site/contact/index.html" || \
     acceptance_fail "approved copy-email action is missing from production"
-elif rg --quiet "Copy email|Email copied|Copy unavailable" "$production_site"; then
+elif acceptance_contains "Copy email|Email copied|Copy unavailable" "$production_site"; then
   acceptance_fail "unapproved contact action entered the production artifact"
 fi
 
