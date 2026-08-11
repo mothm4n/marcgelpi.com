@@ -6,4 +6,12 @@
 /.playwright-cli/
 /node_modules/
 /.site-build.*/
-/docs/
+/output/
+/prototypes/
+/tmp/
+/docs/*
+!/docs/adr/
+!/docs/adr/**
+!/docs/agents/
+!/docs/agents/**
+!/docs/publication-workflow.md
