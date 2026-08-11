@@ -32,7 +32,7 @@ On 11 August 2026, Codex manually reviewed full-page renders of Home, Work, Abou
 
 The same routes were visually reviewed with the WCAG text-spacing overrides applied. Automated coverage checks that text is not clipped inside constrained containers, visible controls remain focusable and within the viewport, and the page does not overflow horizontally.
 
-This records implementation verification, not editorial approval by Marc.
+This section records implementation verification. Marc’s later editorial approval is recorded in the review notes below.
 
 ## Review notes
 
@@ -41,4 +41,4 @@ This records implementation verification, not editorial approval by Marc.
 - Body copy remains at its existing readable size. Acceptance coverage limits primary desktop measures to 80 characters and body line height to 1.5–2.
 - Automated browser coverage checks every public V0 route at 320 px, 390 px, and 1440 px, including WCAG text-spacing overrides and page-level overflow.
 - Representative before/after screenshots were reviewed from `output/quality/before/` and `output/quality/after/`.
-- The CTA copy and secondary Copy email action remain in `review` state and are excluded from production until Marc reviews the rendered mobile and desktop captures and the approval records are completed.
+- Marc approved the rendered mobile and desktop CTA and secondary Copy email states on 11 August 2026. Their approval records are complete, so the production gate includes them.
