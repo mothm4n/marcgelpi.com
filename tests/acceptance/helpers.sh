@@ -14,6 +14,54 @@ acceptance_fail() {
   exit 1
 }
 
+acceptance_publication_record_is_approved() {
+  local data_file=$1
+  local record=$2
+
+  awk -v record="$record" '
+    function scalar_value(line) {
+      sub(/^[^:]+:[[:space:]]*/, "", line)
+      gsub(/^"|"$/, "", line)
+      return line
+    }
+
+    $0 == record ":" {
+      in_record = 1
+      next
+    }
+
+    in_record && /^[^[:space:]]/ {
+      in_record = 0
+      in_publication = 0
+    }
+
+    in_record && /^  publication:/ {
+      in_publication = 1
+      next
+    }
+
+    in_publication && $1 == "status:" {
+      status = scalar_value($0)
+    }
+
+    in_publication && $1 == "reviewed_by:" {
+      reviewed_by = scalar_value($0)
+    }
+
+    in_publication && $1 == "reviewed_at:" {
+      reviewed_at = scalar_value($0)
+    }
+
+    in_publication && $1 == "privacy_reviewed:" {
+      privacy_reviewed = scalar_value($0)
+    }
+
+    END {
+      exit !(status == "approved" && reviewed_by != "" && reviewed_at != "" && privacy_reviewed == "true")
+    }
+  ' "$data_file"
+}
+
 acceptance_assert_eval() {
   local playwright_cli=$1
   local session=$2

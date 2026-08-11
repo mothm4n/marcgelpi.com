@@ -10,9 +10,24 @@ trap acceptance_browser_cleanup EXIT
 production_site="$acceptance_browser_tmp/production-site"
 bash "$acceptance_repo_root/scripts/build-production.sh" "$production_site" >/dev/null
 
-if rg --quiet "Recognize the pattern\?|A shared question\?" "$production_site"; then
-  acceptance_fail "review-only conversation copy entered the production artifact"
+conversation_cta_data="$acceptance_repo_root/data/conversation-ctas.yaml"
+
+if acceptance_publication_record_is_approved "$conversation_cta_data" "about"; then
+  rg --quiet "A shared question\?" "$production_site/about/index.html" || \
+    acceptance_fail "approved About conversation copy is missing from production"
+elif rg --quiet "A shared question\?" "$production_site/about/index.html"; then
+  acceptance_fail "unapproved About conversation copy entered production"
 fi
+
+for production_case in adevinta protected-autonomy preparing-to-scale; do
+  production_case_page="$production_site/work/$production_case/index.html"
+  if acceptance_publication_record_is_approved "$conversation_cta_data" "work"; then
+    rg --quiet "Recognize the pattern\?" "$production_case_page" || \
+      acceptance_fail "approved Work conversation copy is missing from $production_case"
+  elif rg --quiet "Recognize the pattern\?" "$production_case_page"; then
+    acceptance_fail "unapproved Work conversation copy entered $production_case"
+  fi
+done
 
 acceptance_browser_build_preview "$acceptance_browser_site_dir"
 acceptance_browser_start_and_open "$acceptance_browser_site_dir" "/about/"

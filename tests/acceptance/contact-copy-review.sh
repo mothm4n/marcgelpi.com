@@ -10,8 +10,12 @@ trap acceptance_browser_cleanup EXIT
 production_site="$acceptance_browser_tmp/production-site"
 bash "$acceptance_repo_root/scripts/build-production.sh" "$production_site" >/dev/null
 
-if rg --quiet "Copy email|Email copied|Copy unavailable" "$production_site"; then
-  acceptance_fail "review-only contact action entered the production artifact"
+contact_actions_data="$acceptance_repo_root/data/contact-actions.yaml"
+if acceptance_publication_record_is_approved "$contact_actions_data" "copy_email"; then
+  rg --quiet "Copy email" "$production_site/contact/index.html" || \
+    acceptance_fail "approved copy-email action is missing from production"
+elif rg --quiet "Copy email|Email copied|Copy unavailable" "$production_site"; then
+  acceptance_fail "unapproved contact action entered the production artifact"
 fi
 
 acceptance_browser_build_preview "$acceptance_browser_site_dir"

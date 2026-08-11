@@ -17,10 +17,17 @@ acceptance_browser_assert_eval \
   "document.querySelector('main a[href=\"mailto:hello@marcgelpi.com\"]')?.getAttribute('aria-label')" \
   '"Email Marc at hello@marcgelpi.com"'
 
-acceptance_browser_assert_eval \
-  "unapproved secondary contact copy stays outside production" \
-  "document.querySelector('[data-copy-email], [data-copy-email-status]') === null && !document.querySelector('main').textContent.includes('Copy email')" \
-  "true"
+if acceptance_publication_record_is_approved "$acceptance_repo_root/data/contact-actions.yaml" "copy_email"; then
+  acceptance_browser_assert_eval \
+    "approved secondary contact copy appears in production" \
+    "document.querySelector('[data-copy-email]')?.textContent.trim()" \
+    '"Copy email"'
+else
+  acceptance_browser_assert_eval \
+    "unapproved secondary contact copy stays outside production" \
+    "document.querySelector('[data-copy-email], [data-copy-email-status]') === null && !document.querySelector('main').textContent.includes('Copy email')" \
+    "true"
+fi
 
 acceptance_browser_assert_eval \
   "Contact uses the confirmed LinkedIn and GitHub destinations" \
