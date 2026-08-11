@@ -4,10 +4,17 @@
       <p class="eyebrow">Contact</p>
       <h1 id="contact-title">Let’s make the system easier to work in.</h1>
       <div class="contact-introduction">{{ .Content }}</div>
-      <a class="contact-email" href="mailto:{{ site.Params.contact.email }}" aria-label="Email Marc at {{ site.Params.contact.email }}">
-        <span>Email Marc at {{ site.Params.contact.email }}</span>
-        <span aria-hidden="true">↘</span>
-      </a>
+      <div class="contact-actions">
+        <a class="contact-email" href="mailto:{{ site.Params.contact.email }}" aria-label="Email Marc at {{ site.Params.contact.email }}">
+          <span>Email Marc at <span data-contact-email-address>{{ site.Params.contact.email }}</span></span>
+          <span aria-hidden="true">↘</span>
+        </a>
+        <div class="contact-copy-row">
+          <button type="button" class="contact-copy" data-copy-email data-email="{{ site.Params.contact.email }}">Copy email</button>
+          <p class="contact-copy-status" role="status" aria-live="polite" aria-atomic="true" data-copy-email-status></p>
+        </div>
+        <noscript><p class="contact-copy-manual">Select and copy {{ site.Params.contact.email }} manually.</p></noscript>
+      </div>
     </header>
 
     <section class="contact-topics numbered-section" aria-labelledby="contact-topics-title">
@@ -32,4 +39,7 @@
       </div>
     </section>
   </article>
+
+  {{ $contactScript := resources.Get "js/contact.js" | minify | fingerprint }}
+  <script src="{{ $contactScript.RelPermalink }}" integrity="{{ $contactScript.Data.Integrity }}" defer></script>
 {{ end }}

@@ -24,7 +24,7 @@ acceptance_browser_assert_eval \
 
 acceptance_browser_assert_eval \
   "the bank case presents protected autonomy and a precisely scoped observation" \
-  "(() => { const main = document.querySelector('main'); const copy = main?.textContent.toLowerCase() ?? ''; const stages = Array.from(main?.querySelectorAll('section h2') ?? []).map(heading => heading.textContent.trim()).join('|'); return stages === 'Create a protected boundary|Experiment as one product team|Describe only what was observed' && ['agile marketing', 'idea to reality', 'opportunity', 'hierarchical', 'protected island', 'autonomy', 'experimentation', 'roughly two weeks', 'under 24 hours', 'scoped pilot'].every(term => copy.includes(term)); })()" \
+  "(() => { const main = document.querySelector('main'); const copy = main?.textContent.toLowerCase() ?? ''; const stages = Array.from(main?.querySelectorAll('.work-case-progression section h2') ?? []).map(heading => heading.textContent.trim()).join('|'); return stages === 'Create a protected boundary|Experiment as one product team|Describe only what was observed' && ['agile marketing', 'idea to reality', 'opportunity', 'hierarchical', 'protected island', 'autonomy', 'experimentation', 'roughly two weeks', 'under 24 hours', 'scoped pilot'].every(term => copy.includes(term)); })()" \
   "true"
 
 acceptance_browser_assert_eval \
@@ -41,7 +41,7 @@ acceptance_browser_assert_eval \
 
 acceptance_browser_assert_eval \
   "the fintech case covers the approved preparation-for-scale contribution" \
-  "(() => { const main = document.querySelector('main'); const copy = main?.textContent.toLowerCase() ?? ''; const stages = Array.from(main?.querySelectorAll('section h2') ?? []).map(heading => heading.textContent.trim()).join('|'); return stages === 'Preserve what matters|Give product work a lightweight shape|Coordinate across distance' && ['values', 'culture', 'startup identity', 'lightweight product operating model', 'product discovery', 'minimum viable coordination', 'barcelona', 'argentina'].every(term => copy.includes(term)); })()" \
+  "(() => { const main = document.querySelector('main'); const copy = main?.textContent.toLowerCase() ?? ''; const stages = Array.from(main?.querySelectorAll('.work-case-progression section h2') ?? []).map(heading => heading.textContent.trim()).join('|'); return stages === 'Preserve what matters|Give product work a lightweight shape|Coordinate across distance' && ['values', 'culture', 'startup identity', 'lightweight product operating model', 'product discovery', 'minimum viable coordination', 'barcelona', 'argentina'].every(term => copy.includes(term)); })()" \
   "true"
 
 acceptance_browser_assert_eval \
@@ -51,7 +51,7 @@ acceptance_browser_assert_eval \
 
 acceptance_browser_assert_eval \
   "the approved sector case remains structurally accessible" \
-  "(() => { const main = document.querySelector('main'); const sections = Array.from(main?.querySelectorAll('section[aria-labelledby]') ?? []); return main?.querySelectorAll('h1').length === 1 && sections.length === 3 && sections.every(section => document.getElementById(section.getAttribute('aria-labelledby'))); })()" \
+  "(() => { const main = document.querySelector('main'); const sections = Array.from(main?.querySelectorAll('.work-case-progression section[aria-labelledby]') ?? []); return main?.querySelectorAll('h1').length === 1 && sections.length === 3 && sections.every(section => document.getElementById(section.getAttribute('aria-labelledby'))); })()" \
   "true"
 
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" resize 1440 1000 >/dev/null
@@ -65,5 +65,13 @@ acceptance_browser_assert_eval \
   "the fintech case fits a mobile viewport" \
   "document.documentElement.scrollWidth <= document.documentElement.clientWidth" \
   "true"
+
+for case_path in /work/protected-autonomy/ /work/preparing-to-scale/; do
+  "$acceptance_playwright_cli" --session "$acceptance_browser_session" open "http://127.0.0.1:$acceptance_browser_server_port$case_path" >/dev/null
+  acceptance_browser_assert_eval \
+    "the approved conversation invitation closes $case_path" \
+    "(() => { const article = document.querySelector('.work-case'); const cta = article?.querySelector(':scope > [data-conversation-cta]'); const actions = Array.from(cta?.querySelectorAll('a') ?? []); return cta === article?.lastElementChild && cta?.querySelector('.eyebrow')?.textContent.trim() === 'Recognize the pattern?' && cta?.querySelector('h2')?.textContent.trim() === 'Does any of this resonate?' && cta?.querySelector('[data-conversation-copy]')?.textContent.trim() === 'Have you seen a similar pattern in your own organization—or a different version of the same challenge? Let’s compare notes.' && actions.map(link => link.getAttribute('href')).join('|') === '/contact/|/work/'; })()" \
+    "true"
+done
 
 echo "PASS: protected sector case portfolio"

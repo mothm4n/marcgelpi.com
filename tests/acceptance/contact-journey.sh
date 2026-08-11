@@ -18,6 +18,21 @@ acceptance_browser_assert_eval \
   '"Email Marc at hello@marcgelpi.com"'
 
 acceptance_browser_assert_eval \
+  "Contact exposes an accessible secondary copy-email action" \
+  "(() => { const address = document.querySelector('[data-contact-email-address]'); const button = document.querySelector('[data-copy-email]'); const status = document.querySelector('[data-copy-email-status]'); button?.focus(); const style = button && getComputedStyle(button); return address?.textContent.trim() === 'hello@marcgelpi.com' && getComputedStyle(address).userSelect !== 'none' && button?.type === 'button' && button.textContent.trim() === 'Copy email' && document.activeElement === button && style.outlineStyle !== 'none' && parseFloat(style.outlineWidth) > 0 && status?.getAttribute('role') === 'status' && status?.getAttribute('aria-live') === 'polite'; })()" \
+  "true"
+
+acceptance_browser_assert_eval \
+  "copy-email success is announced without moving focus" \
+  "(async () => { Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async value => { window.__copiedEmail = value; } } }); const button = document.querySelector('[data-copy-email]'); button.focus(); button.click(); await new Promise(resolve => setTimeout(resolve, 0)); return window.__copiedEmail === 'hello@marcgelpi.com' && document.querySelector('[data-copy-email-status]')?.textContent.trim() === 'Email copied' && document.activeElement === button; })()" \
+  "true"
+
+acceptance_browser_assert_eval \
+  "copy-email failure leaves a clear manual-copy recovery path" \
+  "(async () => { Object.defineProperty(navigator, 'clipboard', { configurable: true, value: undefined }); const button = document.querySelector('[data-copy-email]'); button.focus(); button.click(); await new Promise(resolve => setTimeout(resolve, 0)); return document.querySelector('[data-copy-email-status]')?.textContent.trim() === 'Copy unavailable. Select and copy hello@marcgelpi.com manually.' && document.querySelector('[data-contact-email-address]')?.textContent.trim() === 'hello@marcgelpi.com' && document.activeElement === button; })()" \
+  "true"
+
+acceptance_browser_assert_eval \
   "Contact uses the confirmed LinkedIn and GitHub destinations" \
   "Array.from(document.querySelectorAll('main a[href^=\"https://\"]')).map(link => link.href).join('|')" \
   '"https://www.linkedin.com/in/gelpi/|https://github.com/mothm4n"'

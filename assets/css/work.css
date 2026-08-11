@@ -254,6 +254,10 @@
     grid-column: 1;
   }
 
+  .work-case-list a {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
   .case-organization {
     grid-column: 1 / -1;
   }
@@ -263,7 +267,8 @@
   }
 
   .work-case-hero {
-    min-height: calc(72svh - var(--header-height));
+    min-height: auto;
+    padding-block: 2.5rem;
   }
 
   .work-case-deck {
@@ -278,7 +283,7 @@
   .work-case-summary > div,
   .work-case-summary > div:nth-child(3),
   .work-case-summary > div:last-child {
-    padding-inline: 0;
+    padding: 1rem 0;
     border-top: 1px solid var(--line);
     border-right: 0;
     border-left: 0;
@@ -289,12 +294,41 @@
   }
 
   .work-case-progression section {
-    grid-template-columns: 4.2rem minmax(0, 1fr);
-    gap: 1.25rem;
+    display: block;
     min-height: auto;
   }
 
   .case-stage-marker {
-    justify-content: flex-start;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .case-stage-marker span {
+    width: 3.2rem;
+    height: 3.2rem;
+  }
+
+  .case-stage-marker::after {
+    display: none;
+  }
+
+  .work-case-progression {
+    padding-block: 2rem;
+  }
+
+  .case-stage-copy {
+    padding-bottom: 1.5rem;
+  }
+
+  .case-stage-copy h2 {
+    margin-bottom: 0.75rem;
+  }
+
+  .case-scope {
+    display: flex;
+    min-height: 3.2rem;
+    align-items: center;
+    padding-left: 4.2rem;
   }
 }

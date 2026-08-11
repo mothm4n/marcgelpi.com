@@ -116,4 +116,14 @@ acceptance_browser_assert_eval \
   "document.activeElement?.textContent.trim()" \
   '"Home"'
 
+for public_path in / /work/ /about/ /contact/; do
+  "$acceptance_playwright_cli" --session "$acceptance_browser_session" open "http://127.0.0.1:$acceptance_browser_server_port$public_path" >/dev/null
+  "$acceptance_playwright_cli" --session "$acceptance_browser_session" resize 320 800 >/dev/null
+
+  acceptance_browser_assert_eval \
+    "the open mobile menu stays above page content on $public_path" \
+    "(() => { const menu = document.querySelector('[data-mobile-navigation]'); menu.open = true; return Array.from(menu.querySelectorAll('a')).every(link => { const bounds = link.getBoundingClientRect(); const topmost = document.elementFromPoint(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2); link.focus(); const style = getComputedStyle(link); return (topmost === link || link.contains(topmost)) && document.activeElement === link && style.outlineStyle !== 'none' && parseFloat(style.outlineWidth) > 0; }); })()" \
+    "true"
+done
+
 echo "PASS: English production site shell"

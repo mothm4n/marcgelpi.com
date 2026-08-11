@@ -1,0 +1,13 @@
+<section class="conversation-cta" aria-labelledby="{{ .Id }}" data-conversation-cta>
+  <p class="eyebrow">{{ .Eyebrow }}</p>
+  <div class="conversation-cta-content">
+    <h2 id="{{ .Id }}">{{ .Heading }}</h2>
+    <p data-conversation-copy>{{ .Body }}</p>
+    <div class="conversation-cta-actions">
+      <a href="{{ .PrimaryHref }}">{{ .PrimaryLabel }} <span aria-hidden="true">→</span></a>
+      {{ with .SecondaryHref }}
+        <a href="{{ . }}">{{ $.SecondaryLabel }} <span aria-hidden="true">↖</span></a>
+      {{ end }}
+    </div>
+  </div>
+</section>

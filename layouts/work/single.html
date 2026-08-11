@@ -41,5 +41,16 @@
     {{ with .Content }}
       <div class="work-case-body">{{ . }}</div>
     {{ end }}
+
+    {{ partial "conversation-cta.html" (dict
+      "Id" "case-conversation-title"
+      "Eyebrow" "Recognize the pattern?"
+      "Heading" "Does any of this resonate?"
+      "Body" "Have you seen a similar pattern in your own organization—or a different version of the same challenge? Let’s compare notes."
+      "PrimaryHref" "/contact/"
+      "PrimaryLabel" "Start a conversation"
+      "SecondaryHref" "/work/"
+      "SecondaryLabel" "Back to all work"
+    ) }}
   </article>
 {{ end }}

@@ -42,6 +42,12 @@ a {
   text-underline-offset: 0.2em;
 }
 
+h1,
+h2,
+h3 {
+  overflow-wrap: anywhere;
+}
+
 a:focus-visible,
 summary:focus-visible,
 button:focus-visible {
@@ -77,12 +83,15 @@ button:focus-visible {
 }
 
 .site-header {
+  position: relative;
+  z-index: 30;
   min-height: var(--header-height);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 2rem;
   padding: 1.1rem var(--page-gutter);
+  background: var(--ivory);
   border-bottom: 1px solid var(--line);
   animation: header-arrival 520ms ease-out both;
 }
@@ -335,6 +344,55 @@ main {
   font-size: clamp(1.15rem, 2vw, 1.45rem);
 }
 
+.conversation-cta {
+  display: grid;
+  grid-template-columns: minmax(8rem, 0.35fr) minmax(0, 1fr);
+  gap: 1.5rem clamp(2rem, 7vw, 8rem);
+  padding: clamp(3.5rem, 7vw, 6.5rem) var(--page-gutter);
+  background: var(--paper);
+  border-top: 1px solid var(--line);
+}
+
+.conversation-cta .eyebrow {
+  margin: 0;
+}
+
+.conversation-cta-content h2 {
+  max-width: 12ch;
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(2.8rem, 6vw, 6rem);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 0.92;
+}
+
+.conversation-cta-content > p {
+  max-width: 43rem;
+  margin: clamp(1.5rem, 3vw, 2.5rem) 0 0;
+  font-family: var(--serif);
+  font-size: clamp(1.15rem, 2vw, 1.55rem);
+  line-height: 1.4;
+}
+
+.conversation-cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+  margin-top: 1.5rem;
+}
+
+.conversation-cta-actions a {
+  display: inline-flex;
+  gap: 0.8rem;
+  align-items: center;
+  padding-block: 0.35rem;
+  color: var(--petrol);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+}
+
 .contact-shell {
   min-height: 65vh;
 }
@@ -344,7 +402,7 @@ main {
   grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.7fr);
   gap: clamp(2rem, 6vw, 7rem);
   align-items: end;
-  padding: clamp(5rem, 11vw, 10rem) var(--page-gutter);
+  padding: clamp(4.5rem, 9vw, 8.75rem) var(--page-gutter);
   border-bottom: 1px solid var(--line);
 }
 
@@ -375,8 +433,11 @@ main {
   margin: 0;
 }
 
-.contact-email {
+.contact-actions {
   grid-column: 2;
+}
+
+.contact-email {
   display: flex;
   gap: 1.5rem;
   align-items: center;
@@ -390,16 +451,46 @@ main {
   animation: text-rise 520ms 210ms ease-out both;
 }
 
-.contact-email span:last-child,
+.contact-email > span:last-child,
 .social-links a span {
   transition: transform 180ms ease;
 }
 
-.contact-email:hover span:last-child,
-.contact-email:focus-visible span:last-child,
+.contact-email:hover > span:last-child,
+.contact-email:focus-visible > span:last-child,
 .social-links a:hover span,
 .social-links a:focus-visible span {
   transform: translate(0.18rem, 0.12rem);
+}
+
+.contact-copy-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1rem;
+  align-items: baseline;
+  margin-top: 0.85rem;
+}
+
+.contact-copy {
+  padding: 0.35rem 0;
+  color: var(--petrol);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.contact-copy-status,
+.contact-copy-manual {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.contact-copy-status {
+  min-height: 1.5em;
 }
 
 .contact-topics,
@@ -513,6 +604,7 @@ main {
 
 @media (max-width: 50rem) {
   :root {
+    --page-gutter: 1rem;
     --header-height: 4.75rem;
   }
 
@@ -590,6 +682,16 @@ main {
     gap: 1rem;
   }
 
+  .conversation-cta {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding-block: 2.25rem;
+  }
+
+  .conversation-cta-content h2 {
+    font-size: clamp(2.75rem, 13vw, 4.5rem);
+  }
+
   .editorial-list a {
     grid-template-columns: 1fr auto;
     gap: 0.75rem 1rem;
@@ -597,16 +699,21 @@ main {
 
   .contact-hero {
     grid-template-columns: 1fr;
-    padding-block: 4rem;
+    padding-block: 3.25rem;
   }
 
-  .contact-email {
+  .contact-actions {
     grid-column: 1;
   }
 
   .contact-topics li {
     grid-template-columns: 1fr;
     gap: 0.45rem;
+  }
+
+  .contact-topics,
+  .contact-social {
+    padding-block: 3.25rem;
   }
 
   .site-footer {

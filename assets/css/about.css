@@ -305,12 +305,28 @@
   }
 
   .about-introduction {
-    min-height: calc(68svh - var(--header-height));
-    padding-block: 4rem;
+    min-height: auto;
+    padding-block: 2.5rem;
   }
 
   .about-portrait {
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 16 / 9;
+  }
+
+  .about-story,
+  .about-principles,
+  .about-career {
+    padding-block: 2.25rem;
+  }
+
+  .about-story h2 {
+    margin-block: 2.2rem 1rem;
+  }
+
+  .about-principles h2,
+  .about-career > div > h2 {
+    margin-bottom: 2rem;
+    font-size: clamp(2.65rem, 12vw, 4.5rem);
   }
 
   .about-career article {
@@ -332,7 +348,7 @@
 
   .about-values li {
     min-height: auto;
-    padding: 1.25rem 0;
+    padding: 0.85rem 0;
   }
 
   .about-values li:nth-child(n + 4),
@@ -349,5 +365,26 @@
   .about-career article > p:last-child {
     grid-column: 1;
     grid-row: auto;
+  }
+
+  .about-strengths li,
+  .about-strengths li:nth-child(even) {
+    padding-block: 1.1rem;
+  }
+
+  .about-career li {
+    padding-block: 1.1rem;
+  }
+
+  .earlier-career {
+    padding-block: 1.5rem;
+  }
+
+  .about-values {
+    margin-bottom: 2.5rem;
+  }
+
+  .about-strengths-heading {
+    margin-bottom: 1.25rem;
   }
 }

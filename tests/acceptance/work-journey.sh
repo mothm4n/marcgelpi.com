@@ -24,11 +24,28 @@ acceptance_browser_assert_eval \
   "(() => { const link = document.querySelector('main a[href=\"/work/adevinta/\"]'); link?.focus(); const style = link && getComputedStyle(link); return document.activeElement === link && style.outlineStyle !== 'none' && parseFloat(style.outlineWidth) > 0; })()" \
   "true"
 
+for mobile_viewport in "320 800" "390 844"; do
+  viewport_width=${mobile_viewport%% *}
+  viewport_height=${mobile_viewport##* }
+  "$acceptance_playwright_cli" --session "$acceptance_browser_session" resize "$viewport_width" "$viewport_height" >/dev/null
+
+  acceptance_browser_assert_eval \
+    "Selected case studies uses the available title width at ${viewport_width}px" \
+    "(() => Array.from(document.querySelectorAll('.work-case-list a')).every(link => { const style = getComputedStyle(link); const title = link.querySelector('strong'); const label = link.firstElementChild; const titleWidth = title?.getBoundingClientRect().width ?? 0; return style.gridTemplateColumns.split(' ').length === 2 && getComputedStyle(label).gridColumnEnd === '-1' && titleWidth >= link.getBoundingClientRect().width * 0.7 && link.scrollWidth <= link.clientWidth; }))()" \
+    "true"
+done
+
+"$acceptance_playwright_cli" --session "$acceptance_browser_session" resize 1440 1000 >/dev/null
+acceptance_browser_assert_eval \
+  "Selected case studies retains its three-column desktop composition" \
+  "Array.from(document.querySelectorAll('.work-case-list a')).every(link => getComputedStyle(link).gridTemplateColumns.split(' ').length === 3)" \
+  "true"
+
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" open "http://127.0.0.1:$acceptance_browser_server_port/work/adevinta/" >/dev/null
 
 acceptance_browser_assert_eval \
   "the Adevinta case progresses from a marketplace partnership to the European methodology team" \
-  "(() => { const main = document.querySelector('main'); const copy = main?.textContent.toLowerCase() ?? ''; const stages = Array.from(main?.querySelectorAll('section h2') ?? []).map(heading => heading.textContent.trim()).join('|'); return stages === 'Begin with one marketplace|Build a shared practice in Spain|Coordinate across Europe' && ['motors', 'eight teams', 'less than six months', 'hands-on', 'engineering managers', 'human resources business partner', 'individual and collective', 'make the way of working stick', 'peak', '20%', '60%', 'grounded theory', 'okr', 'two quarters', 'more than 1,000', 'adevinta academy', 'talent acquisition', 'time-to-hire', 'agile methodology team', 'european transformation lead', 'more than 30 agile coaches', 'local context', 'marketplaces'].every(term => copy.includes(term)) && !copy.includes('co-lead'); })()" \
+  "(() => { const main = document.querySelector('main'); const copy = main?.textContent.toLowerCase() ?? ''; const stages = Array.from(main?.querySelectorAll('.work-case-progression section h2') ?? []).map(heading => heading.textContent.trim()).join('|'); return stages === 'Begin with one marketplace|Build a shared practice in Spain|Coordinate across Europe' && ['motors', 'eight teams', 'less than six months', 'hands-on', 'engineering managers', 'human resources business partner', 'individual and collective', 'make the way of working stick', 'peak', '20%', '60%', 'grounded theory', 'okr', 'two quarters', 'more than 1,000', 'adevinta academy', 'talent acquisition', 'time-to-hire', 'agile methodology team', 'european transformation lead', 'more than 30 agile coaches', 'local context', 'marketplaces'].every(term => copy.includes(term)) && !copy.includes('co-lead'); })()" \
   "true"
 
 acceptance_browser_assert_eval \
@@ -49,6 +66,11 @@ acceptance_browser_assert_eval \
 acceptance_browser_assert_eval \
   "the case avoids inflated outcomes and private or internal material" \
   "(() => { const main = document.querySelector('main'); const copy = main?.textContent.toLowerCase() ?? ''; return !/fundraising|due diligence|ipo|revenue|internal screenshot|verbatim quotation|transformation succeeded|single-handedly/.test(copy) && main?.querySelector('iframe, form, [data-internal-artifact]') === null; })()" \
+  "true"
+
+acceptance_browser_assert_eval \
+  "the Adevinta case closes with the approved contextual conversation invitation" \
+  "(() => { const article = document.querySelector('.work-case'); const cta = article?.querySelector(':scope > [data-conversation-cta]'); const actions = Array.from(cta?.querySelectorAll('a') ?? []); return cta === article?.lastElementChild && cta?.querySelector('.eyebrow')?.textContent.trim() === 'Recognize the pattern?' && cta?.querySelector('h2')?.textContent.trim() === 'Does any of this resonate?' && cta?.querySelector('[data-conversation-copy]')?.textContent.trim() === 'Have you seen a similar pattern in your own organization—or a different version of the same challenge? Let’s compare notes.' && actions.map(link => link.textContent.replace(/\\s+/g, ' ').trim()).join('|') === 'Start a conversation →|Back to all work ↖' && actions.map(link => link.getAttribute('href')).join('|') === '/contact/|/work/' && actions.every(link => { link.focus(); const style = getComputedStyle(link); return document.activeElement === link && style.outlineStyle !== 'none' && parseFloat(style.outlineWidth) > 0; }); })()" \
   "true"
 
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" resize 1440 1000 >/dev/null

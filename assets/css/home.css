@@ -7,6 +7,7 @@
 
 .home-hero-copy {
   display: grid;
+  min-width: 0;
   align-content: center;
   padding: clamp(4rem, 8vw, 8rem) var(--page-gutter);
 }
@@ -248,11 +249,11 @@
   }
 
   .home-hero-copy {
-    min-height: calc(82svh - var(--header-height));
+    min-height: calc(79svh - var(--header-height));
   }
 
   .home-hero h1 {
-    font-size: clamp(3.3rem, 14vw, 5.5rem);
+    font-size: clamp(2.75rem, 14vw, 5.5rem);
   }
 
   .home-thesis,
@@ -262,7 +263,7 @@
 
   .home-portrait {
     min-height: auto;
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 4 / 3;
   }
 
   .home-work-list a {
@@ -287,7 +288,7 @@
   .home-method > ol > li:first-child,
   .home-method > ol > li:last-child {
     min-height: auto;
-    padding: 2rem 0;
+    padding: 1.5rem 0;
     border-right: 0;
     border-bottom: 1px solid var(--line);
   }
@@ -296,4 +297,17 @@
     margin-bottom: 2rem;
   }
 
+  .home-conversation h2 {
+    font-size: clamp(3.4rem, 16vw, 6.5rem);
+  }
+
+  .home-work,
+  .home-method {
+    padding-block: 2.75rem;
+  }
+
+  .home-conversation {
+    min-height: auto;
+    padding-block: 3rem;
+  }
 }

@@ -45,6 +45,11 @@ acceptance_browser_assert_eval \
   "true"
 
 acceptance_browser_assert_eval \
+  "About closes the selected career history with the approved conversation path" \
+  "(() => { const article = document.querySelector('.about-shell'); const career = article?.querySelector('.about-career'); const cta = article?.querySelector(':scope > [data-conversation-cta]'); const action = cta?.querySelector('a'); return cta === article?.lastElementChild && career?.nextElementSibling === cta && cta?.querySelector('.eyebrow')?.textContent.trim() === 'A shared question?' && cta?.querySelector('h2')?.textContent.trim() === 'Let’s compare notes.' && cta?.querySelector('[data-conversation-copy]')?.textContent.trim() === 'If something in this story connects with a challenge you’re working through, I’d be glad to hear from you.' && action?.textContent.replace(/\\s+/g, ' ').trim() === 'Start a conversation →' && action?.getAttribute('href') === '/contact/' && career?.querySelector('a[href=\"https://www.linkedin.com/in/gelpi/\"]') !== null; })()" \
+  "true"
+
+acceptance_browser_assert_eval \
   "the approved About photograph is responsive, dimensioned, and meaningfully described" \
   "(() => { const picture = document.querySelector('main picture'); const image = picture?.querySelector('img'); const srcset = picture?.querySelector('source')?.srcset ?? ''; return image?.alt === 'Marc Gelpí in conversation beneath the roof of a Barcelona market' && Number(image?.getAttribute('width')) > 0 && Number(image?.getAttribute('height')) > 0 && ['480w', '800w', '1200w'].every(width => srcset.includes(width)); })()" \
   "true"
