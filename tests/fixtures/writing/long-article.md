@@ -7,6 +7,10 @@ publication:
   status: "review"
 ---
 
+This test-only opening verifies the explicitly requested short layer.
+
+<!--more-->
+
 ## Long argument
 
 LONG_CONTENT_MARKER

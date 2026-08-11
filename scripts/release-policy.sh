@@ -8,13 +8,14 @@ release_public_paths=(
   /work/protected-autonomy/
   /work/preparing-to-scale/
   /about/
+  /writing/
+  /writing/life-isnt-always-a-river/
   /contact/
   /404.html
 )
 
 # Routes intentionally kept out of the focused V1 until they have approved content.
 release_hidden_paths=(
-  /writing/
   /resources/
   /authors/
   /categories/

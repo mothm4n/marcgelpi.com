@@ -11,7 +11,8 @@
       </p>
     </header>
 
-    {{ if ge .WordCount site.Params.writing.longReadWordThreshold }}
+    {{ $hasTableOfContents := strings.Contains .TableOfContents "<li>" }}
+    {{ if and (ge .WordCount site.Params.writing.longReadWordThreshold) $hasTableOfContents }}
       <nav class="writing-toc" aria-label="On this page">
         <p>On this page</p>
         {{ .TableOfContents }}
@@ -19,7 +20,7 @@
     {{ end }}
 
     <div class="writing-reading-column">
-      {{ if .Truncated }}
+      {{ if strings.Contains .RawContent "<!--more-->" }}
         <section class="writing-first-layer" data-article-first-layer aria-labelledby="short-version-title">
           <h2 id="short-version-title">The short version</h2>
           {{ .Summary }}

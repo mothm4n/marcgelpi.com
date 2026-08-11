@@ -15,3 +15,7 @@ This repository uses the single-context layout. See `docs/agents/domain.md`.
 ### Publication workflow
 
 When preparing, approving, or publishing editorial content, follow `docs/publication-workflow.md`.
+
+### Editorial voice
+
+When drafting, rewriting, or reviewing English website articles in `content/writing/`, follow `docs/agents/editorial-voice.md` and complete its voice check before handoff.
