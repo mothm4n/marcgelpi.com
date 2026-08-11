@@ -68,11 +68,6 @@ acceptance_browser_assert_eval \
   "(() => { const main = document.querySelector('main'); const copy = main?.textContent.toLowerCase() ?? ''; return !/fundraising|due diligence|ipo|revenue|internal screenshot|verbatim quotation|transformation succeeded|single-handedly/.test(copy) && main?.querySelector('iframe, form, [data-internal-artifact]') === null; })()" \
   "true"
 
-acceptance_browser_assert_eval \
-  "the Adevinta case closes with the approved contextual conversation invitation" \
-  "(() => { const article = document.querySelector('.work-case'); const cta = article?.querySelector(':scope > [data-conversation-cta]'); const actions = Array.from(cta?.querySelectorAll('a') ?? []); return cta === article?.lastElementChild && cta?.querySelector('.eyebrow')?.textContent.trim() === 'Recognize the pattern?' && cta?.querySelector('h2')?.textContent.trim() === 'Does any of this resonate?' && cta?.querySelector('[data-conversation-copy]')?.textContent.trim() === 'Have you seen a similar pattern in your own organization—or a different version of the same challenge? Let’s compare notes.' && actions.map(link => link.textContent.replace(/\\s+/g, ' ').trim()).join('|') === 'Start a conversation →|Back to all work ↖' && actions.map(link => link.getAttribute('href')).join('|') === '/contact/|/work/' && actions.every(link => { link.focus(); const style = getComputedStyle(link); return document.activeElement === link && style.outlineStyle !== 'none' && parseFloat(style.outlineWidth) > 0; }); })()" \
-  "true"
-
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" resize 1440 1000 >/dev/null
 acceptance_browser_assert_eval \
   "the Adevinta case fits a desktop viewport" \

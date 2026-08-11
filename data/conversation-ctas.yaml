@@ -1,0 +1,27 @@
+about:
+  id: "about-conversation-title"
+  eyebrow: "A shared question?"
+  heading: "Let’s compare notes."
+  body: "If something in this story connects with a challenge you’re working through, I’d be glad to hear from you."
+  primary_href: "/contact/"
+  primary_label: "Start a conversation"
+  publication:
+    status: "review"
+    reviewed_by: ""
+    reviewed_at: ""
+    privacy_reviewed: false
+
+work:
+  id: "case-conversation-title"
+  eyebrow: "Recognize the pattern?"
+  heading: "Does any of this resonate?"
+  body: "Have you seen a similar pattern in your own organization—or a different version of the same challenge? Let’s compare notes."
+  primary_href: "/contact/"
+  primary_label: "Start a conversation"
+  secondary_href: "/work/"
+  secondary_label: "Back to all work"
+  publication:
+    status: "review"
+    reviewed_by: ""
+    reviewed_at: ""
+    privacy_reviewed: false

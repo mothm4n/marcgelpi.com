@@ -116,14 +116,57 @@ acceptance_browser_assert_eval \
   "document.activeElement?.textContent.trim()" \
   '"Home"'
 
-for public_path in / /work/ /about/ /contact/; do
-  "$acceptance_playwright_cli" --session "$acceptance_browser_session" open "http://127.0.0.1:$acceptance_browser_server_port$public_path" >/dev/null
-  "$acceptance_playwright_cli" --session "$acceptance_browser_session" resize 320 800 >/dev/null
+mobile_route_checks=(
+  "/|/work/|2"
+  "/work/|/about/|3"
+  "/about/|/contact/|4"
+  "/contact/|/|1"
+)
 
-  acceptance_browser_assert_eval \
-    "the open mobile menu stays above page content on $public_path" \
-    "(() => { const menu = document.querySelector('[data-mobile-navigation]'); menu.open = true; return Array.from(menu.querySelectorAll('a')).every(link => { const bounds = link.getBoundingClientRect(); const topmost = document.elementFromPoint(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2); link.focus(); const style = getComputedStyle(link); return (topmost === link || link.contains(topmost)) && document.activeElement === link && style.outlineStyle !== 'none' && parseFloat(style.outlineWidth) > 0; }); })()" \
-    "true"
+for viewport in "320 800" "390 844"; do
+  viewport_width=${viewport%% *}
+  viewport_height=${viewport##* }
+
+  for route_check in "${mobile_route_checks[@]}"; do
+    IFS='|' read -r source_path target_path target_tabs <<< "$route_check"
+
+    "$acceptance_playwright_cli" --session "$acceptance_browser_session" open "http://127.0.0.1:$acceptance_browser_server_port$source_path" >/dev/null
+    "$acceptance_playwright_cli" --session "$acceptance_browser_session" resize "$viewport_width" "$viewport_height" >/dev/null
+    "$acceptance_playwright_cli" --session "$acceptance_browser_session" click "[data-mobile-navigation] summary" >/dev/null
+
+    acceptance_browser_assert_eval \
+      "the pointer-opened menu stays above $source_path content at ${viewport_width}px" \
+      "(() => { const menu = document.querySelector('[data-mobile-navigation]'); return menu.open && Array.from(menu.querySelectorAll('a')).every(link => { const bounds = link.getBoundingClientRect(); const topmost = document.elementFromPoint(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2); return topmost === link || link.contains(topmost); }); })()" \
+      "true"
+
+    "$acceptance_playwright_cli" --session "$acceptance_browser_session" click "[data-mobile-navigation] a[href='$target_path']" >/dev/null
+    acceptance_browser_assert_eval \
+      "pointer activation reaches $target_path at ${viewport_width}px" \
+      "window.location.pathname" \
+      "\"$target_path\""
+
+    "$acceptance_playwright_cli" --session "$acceptance_browser_session" open "http://127.0.0.1:$acceptance_browser_server_port$source_path" >/dev/null
+    "$acceptance_playwright_cli" --session "$acceptance_browser_session" resize "$viewport_width" "$viewport_height" >/dev/null
+    "$acceptance_playwright_cli" --session "$acceptance_browser_session" press Tab >/dev/null
+    "$acceptance_playwright_cli" --session "$acceptance_browser_session" press Tab >/dev/null
+    "$acceptance_playwright_cli" --session "$acceptance_browser_session" press Tab >/dev/null
+    "$acceptance_playwright_cli" --session "$acceptance_browser_session" press Enter >/dev/null
+
+    for ((tab_index = 0; tab_index < target_tabs; tab_index++)); do
+      "$acceptance_playwright_cli" --session "$acceptance_browser_session" press Tab >/dev/null
+    done
+
+    acceptance_browser_assert_eval \
+      "keyboard traversal exposes visible focus for $target_path at ${viewport_width}px" \
+      "(() => { const link = document.activeElement; const style = getComputedStyle(link); return link?.getAttribute('href') === '$target_path' && style.outlineStyle !== 'none' && parseFloat(style.outlineWidth) > 0; })()" \
+      "true"
+
+    "$acceptance_playwright_cli" --session "$acceptance_browser_session" press Enter >/dev/null
+    acceptance_browser_assert_eval \
+      "keyboard activation reaches $target_path at ${viewport_width}px" \
+      "window.location.pathname" \
+      "\"$target_path\""
+  done
 done
 
 echo "PASS: English production site shell"

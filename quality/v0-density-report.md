@@ -1,6 +1,6 @@
 # V0 information-density report
 
-Measured against production builds in Chromium. Full-page review captures were taken at 390×844 and 1440×1000 for Home, Work, About, Contact, and the Adevinta case.
+Measured in Chromium against the review build that includes the new conversation CTAs. Full-page review captures were taken at 390×844 and 1440×1000 for Home, Work, About, Contact, and the Adevinta case.
 
 ## Mobile — 390×844
 
@@ -24,7 +24,15 @@ The Adevinta after measurement includes the new contextual conversation CTA. Abo
 | Contact | 2,192 px | 2.19 | 2,187 px | 2.19 | −5 px / 0.00 |
 | Adevinta case | 4,186 px | 4.19 | 4,720 px | 4.72 | +534 px / +0.53 |
 
-The desktop increases on About and Adevinta are the space required by the approved CTA content introduced in issues #14 and #15. Existing content was not removed or rewritten to reach the density targets.
+The desktop increases on About and Adevinta are the space required by the proposed CTA content introduced in issues #14 and #15. Existing content was not removed or rewritten to reach the density targets.
+
+## Manual accessibility review
+
+On 11 August 2026, Codex manually reviewed full-page renders of Home, Work, About, Contact, and Adevinta at the 320 CSS-pixel reflow width produced by a 1280-pixel viewport at 400% zoom. Each route reflowed vertically without page-level horizontal scrolling, text remained readable, and the mobile navigation and visible page controls remained available. Automated coverage separately activates every mobile navigation destination with pointer and keyboard at both 320 px and 390 px.
+
+The same routes were visually reviewed with the WCAG text-spacing overrides applied. Automated coverage checks that text is not clipped inside constrained containers, visible controls remain focusable and within the viewport, and the page does not overflow horizontally.
+
+This records implementation verification, not editorial approval by Marc.
 
 ## Review notes
 
@@ -33,3 +41,4 @@ The desktop increases on About and Adevinta are the space required by the approv
 - Body copy remains at its existing readable size. Acceptance coverage limits primary desktop measures to 80 characters and body line height to 1.5–2.
 - Automated browser coverage checks every public V0 route at 320 px, 390 px, and 1440 px, including WCAG text-spacing overrides and page-level overflow.
 - Representative before/after screenshots were reviewed from `output/quality/before/` and `output/quality/after/`.
+- The CTA copy remains in `review` state and is excluded from production until Marc reviews the rendered mobile and desktop captures and the approval record is completed.

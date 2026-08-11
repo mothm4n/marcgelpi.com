@@ -42,15 +42,10 @@
       <div class="work-case-body">{{ . }}</div>
     {{ end }}
 
-    {{ partial "conversation-cta.html" (dict
-      "Id" "case-conversation-title"
-      "Eyebrow" "Recognize the pattern?"
-      "Heading" "Does any of this resonate?"
-      "Body" "Have you seen a similar pattern in your own organization—or a different version of the same challenge? Let’s compare notes."
-      "PrimaryHref" "/contact/"
-      "PrimaryLabel" "Start a conversation"
-      "SecondaryHref" "/work/"
-      "SecondaryLabel" "Back to all work"
-    ) }}
+    {{ $conversationCtas := index hugo.Data "conversation-ctas" }}
+    {{ $conversationCta := index $conversationCtas "work" }}
+    {{ if or (not hugo.IsProduction) (partial "conversation-cta-approved.html" $conversationCta) }}
+      {{ partial "conversation-cta.html" $conversationCta }}
+    {{ end }}
   </article>
 {{ end }}

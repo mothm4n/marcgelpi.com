@@ -88,13 +88,10 @@
       </div>
     </section>
 
-    {{ partial "conversation-cta.html" (dict
-      "Id" "about-conversation-title"
-      "Eyebrow" "A shared question?"
-      "Heading" "Let’s compare notes."
-      "Body" "If something in this story connects with a challenge you’re working through, I’d be glad to hear from you."
-      "PrimaryHref" "/contact/"
-      "PrimaryLabel" "Start a conversation"
-    ) }}
+    {{ $conversationCtas := index hugo.Data "conversation-ctas" }}
+    {{ $conversationCta := index $conversationCtas "about" }}
+    {{ if or (not hugo.IsProduction) (partial "conversation-cta-approved.html" $conversationCta) }}
+      {{ partial "conversation-cta.html" $conversationCta }}
+    {{ end }}
   </article>
 {{ end }}

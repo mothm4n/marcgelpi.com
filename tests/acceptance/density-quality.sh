@@ -7,7 +7,7 @@ source "$acceptance_directory/helpers.sh"
 acceptance_browser_setup "marcgelpi-density" "${SITE_DENSITY_TEST_PORT:-4193}" "marcgelpi-density-$$"
 trap acceptance_browser_cleanup EXIT
 
-bash "$acceptance_repo_root/scripts/build-production.sh" "$acceptance_browser_site_dir" >/dev/null
+acceptance_browser_build_preview "$acceptance_browser_site_dir"
 acceptance_browser_start_and_open "$acceptance_browser_site_dir" "/"
 
 density_targets=(

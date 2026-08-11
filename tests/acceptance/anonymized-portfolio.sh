@@ -66,12 +66,4 @@ acceptance_browser_assert_eval \
   "document.documentElement.scrollWidth <= document.documentElement.clientWidth" \
   "true"
 
-for case_path in /work/protected-autonomy/ /work/preparing-to-scale/; do
-  "$acceptance_playwright_cli" --session "$acceptance_browser_session" open "http://127.0.0.1:$acceptance_browser_server_port$case_path" >/dev/null
-  acceptance_browser_assert_eval \
-    "the approved conversation invitation closes $case_path" \
-    "(() => { const article = document.querySelector('.work-case'); const cta = article?.querySelector(':scope > [data-conversation-cta]'); const actions = Array.from(cta?.querySelectorAll('a') ?? []); return cta === article?.lastElementChild && cta?.querySelector('.eyebrow')?.textContent.trim() === 'Recognize the pattern?' && cta?.querySelector('h2')?.textContent.trim() === 'Does any of this resonate?' && cta?.querySelector('[data-conversation-copy]')?.textContent.trim() === 'Have you seen a similar pattern in your own organization—or a different version of the same challenge? Let’s compare notes.' && actions.map(link => link.getAttribute('href')).join('|') === '/contact/|/work/'; })()" \
-    "true"
-done
-
 echo "PASS: protected sector case portfolio"

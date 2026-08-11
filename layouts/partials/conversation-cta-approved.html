@@ -1,0 +1,7 @@
+{{ $publication := .publication }}
+{{ return (and
+  (eq $publication.status "approved")
+  $publication.reviewed_by
+  $publication.reviewed_at
+  $publication.privacy_reviewed
+) }}
