@@ -10,13 +10,14 @@ release_public_paths=(
   /about/
   /writing/
   /writing/life-isnt-always-a-river/
+  /resources/
+  /resources/how-to-sell-okrs/
   /contact/
   /404.html
 )
 
 # Routes intentionally kept out of the focused V1 until they have approved content.
 release_hidden_paths=(
-  /resources/
   /authors/
   /categories/
   /series/

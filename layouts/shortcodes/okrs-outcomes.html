@@ -1,0 +1,7 @@
+{{ $resource := hugo.Data.resources.how_to_sell_okrs }}
+{{ range $resource.outcomes }}
+  <h3>{{ .title }}</h3>
+  <p>{{ .body }}</p>
+  {{ with .qualification }}<p>{{ . }}</p>{{ end }}
+  <p><strong>Ask: {{ .question }}</strong></p>
+{{ end }}

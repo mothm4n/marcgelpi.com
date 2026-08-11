@@ -1,0 +1,5 @@
+<ol>
+  {{ range hugo.Data.resources.how_to_sell_okrs.conversation_moves }}
+    <li><strong>{{ .title }}:</strong> “{{ .prompt }}”</li>
+  {{ end }}
+</ol>

@@ -1,12 +1,12 @@
 ---
 title: "Resources"
 description: "Practical material for leaders and teams working on organizational effectiveness."
-draft: true
+draft: false
 publication:
-  status: "review"
-  reviewed_by: ""
-  reviewed_at: ""
-  privacy_reviewed: false
+  status: "approved"
+  reviewed_by: "Marc Gelpí"
+  reviewed_at: "2026-08-11"
+  privacy_reviewed: true
 ---
 
-Use these resources to make a practical first move: frame the problem, gather evidence, and improve the system before reaching for a packaged answer.
+Use these resources to explain a difficult idea, make a practical first move, and improve the system before reaching for a packaged answer.

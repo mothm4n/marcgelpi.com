@@ -1,0 +1,82 @@
+{
+  "outcomes": [
+    {
+      "number": "01",
+      "title": "Focus and commitment",
+      "summary": "Make the few priorities that deserve protected capacity explicit - and give teams permission to say no.",
+      "body": "OKRs force a choice about what deserves disproportionate attention now. The value is not the list of goals. It is the permission to reduce attention elsewhere.",
+      "question": "Which priorities are important enough that we will protect capacity for them?",
+      "qualification": "If everything remains a priority after the OKR conversation, the organization has documented its workload rather than created focus."
+    },
+    {
+      "number": "02",
+      "title": "Alignment and connection",
+      "summary": "Connect visible team goals to shared outcomes and expose the coordination that those outcomes require.",
+      "body": "Visible objectives help teams understand how their work connects to a shared outcome. That transparency can expose competing assumptions and cross-team dependencies before they become delivery surprises.",
+      "question": "Where are teams currently optimizing locally because the shared outcome is unclear?",
+      "qualification": "OKRs do not manage dependencies for you. They make the need for coordination harder to ignore."
+    },
+    {
+      "number": "03",
+      "title": "Tracking and accountability",
+      "summary": "Use regular evidence to surface drift early enough to change the plan, without turning check-ins into blame.",
+      "body": "Regular check-ins create a place to inspect evidence, surface risk and adjust the plan. Accountability here should mean responsibility without blame: an endangered Key Result triggers a conversation, not a verdict.",
+      "question": "How early do we learn that an important outcome is drifting, and what can we still change when we learn it?",
+      "qualification": ""
+    },
+    {
+      "number": "04",
+      "title": "Stretch and learning",
+      "summary": "Create room for ambitious experiments while separating aspirational targets from performance promises.",
+      "body": "An ambitious objective can encourage teams to test approaches they would otherwise dismiss. That only works when leaders distinguish an aspirational target from a promise and treat a miss as evidence to examine.",
+      "question": "Where would a bolder outcome create useful experimentation rather than reckless pressure?",
+      "qualification": ""
+    }
+  ],
+  "observable_costs": [
+    "Teams cannot name the top company priorities consistently.",
+    "Roadmaps contain more commitments than available capacity.",
+    "Dependencies surface after delivery has started.",
+    "Status reporting describes activity, not movement in outcomes.",
+    "Priorities change without a visible reason.",
+    "Ambitious bets disappear behind business-as-usual work."
+  ],
+  "conversation_moves": [
+    {"number": "01", "title": "Current cost", "prompt": "We are seeing these two recurring problems..."},
+    {"number": "02", "title": "Desired behavior", "prompt": "We need clearer trade-offs and earlier evidence of drift..."},
+    {"number": "03", "title": "Why OKRs may help", "prompt": "A few visible outcomes and regular check-ins could create those behaviors..."},
+    {"number": "04", "title": "Bounded pilot", "prompt": "Let us test one area for one cycle, without linking OKRs to compensation..."},
+    {"number": "05", "title": "Decision rule", "prompt": "At the end, we will inspect these signals and decide whether to adapt, stop or expand..."}
+  ],
+  "objections": [
+    {
+      "title": "This is another layer of process.",
+      "response": "It will be if OKRs sit on top of every existing priority. The pilot must replace or simplify part of the current goal conversation."
+    },
+    {
+      "title": "Goals change too often here.",
+      "response": "Make assumptions and confidence visible. A changed decision can be healthy when the evidence and trade-off are explained."
+    },
+    {
+      "title": "People will game the numbers.",
+      "response": "Keep learning goals separate from performance judgment. Combine metrics with qualitative evidence and never turn one KR into the whole story."
+    },
+    {
+      "title": "We already have KPIs.",
+      "response": "Keep them. KPIs monitor system health. OKRs highlight the limited outcomes that need meaningful change now."
+    }
+  ],
+  "success_signals": [
+    "Leaders made clearer priority trade-offs.",
+    "Teams could connect their work to shared outcomes.",
+    "Check-ins surfaced risk early enough to change a decision.",
+    "Ambition increased without punitive target management."
+  ],
+  "pitch": "We do not need OKRs because other companies use them. We need a better way to make a few strategic priorities explicit, connect teams around outcomes and learn earlier when our bets are wrong. I propose a one-cycle pilot in one area, with no link to compensation. We will judge it by whether it improves trade-offs, coordination, learning and ambition - then decide whether to stop, adapt or expand.",
+  "source": {
+    "title": "Five Benefits of OKRs",
+    "url": "https://www.whatmatters.com/okrs-explained/benefits-of-okrs/",
+    "attribution": "John Doerr",
+    "guardrail": "Use the benefits as a diagnostic lens, not as proof that OKRs are automatically right for your organization."
+  }
+}

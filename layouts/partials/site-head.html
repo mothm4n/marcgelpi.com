@@ -8,7 +8,7 @@
 {{ $pageDescription := .Description | default site.Params.description }}
 {{ if eq .Kind "404" }}{{ $pageDescription = printf "The requested page could not be found on %s’s site." site.Params.author.name }}{{ end }}
 {{ $openGraphType := "website" }}
-{{ if and .IsPage (in (slice "work" "writing") .Section) }}{{ $openGraphType = "article" }}{{ end }}
+{{ if and .IsPage (in (slice "work" "writing" "resources") .Section) }}{{ $openGraphType = "article" }}{{ end }}
 {{ if eq .RelPermalink "/about/" }}{{ $openGraphType = "profile" }}{{ end }}
 {{ $socialSource := resources.Get site.Params.portrait.image }}
 {{ $socialImage := $socialSource.Fill "1200x630 Center webp q84" }}

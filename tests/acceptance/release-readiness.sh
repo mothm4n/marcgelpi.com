@@ -27,7 +27,8 @@ article_paths_json=$(paths_to_json \
   "/work/adevinta/" \
   "/work/protected-autonomy/" \
   "/work/preparing-to-scale/" \
-  "/writing/life-isnt-always-a-river/")
+  "/writing/life-isnt-always-a-river/" \
+  "/resources/how-to-sell-okrs/")
 forbidden_pattern_json=$(node -e 'process.stdout.write(JSON.stringify(process.argv[1]))' "$release_forbidden_artifact_pattern")
 axe_audit_expression="(async () => { if (!window.axe) { const source = await fetch('/__axe.min.js').then(response => response.text()); (0, eval)(source); } const results = await window.axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22a', 'wcag22aa'] } }); return results.violations.filter(violation => ['serious', 'critical'].includes(violation.impact)).map(violation => violation.id).join('|'); })()"
 

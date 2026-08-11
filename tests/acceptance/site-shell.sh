@@ -26,7 +26,7 @@ acceptance_browser_assert_eval \
 acceptance_browser_assert_eval \
   "primary navigation matches the V1 information architecture" \
   "Array.from(document.querySelectorAll('[data-primary-navigation] a')).map(link => link.textContent.trim()).join('|')" \
-  '"Home|Work|About|Writing|Contact"'
+  '"Home|Work|About|Writing|Resources|Contact"'
 
 acceptance_browser_assert_eval \
   "every primary destination is served" \
@@ -120,7 +120,8 @@ mobile_route_checks=(
   "/|/work/|2"
   "/work/|/about/|3"
   "/about/|/writing/|4"
-  "/writing/|/contact/|5"
+  "/writing/|/resources/|5"
+  "/resources/|/contact/|6"
   "/contact/|/|1"
 )
 
