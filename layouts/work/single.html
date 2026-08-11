@@ -42,10 +42,6 @@
       <div class="work-case-body">{{ . }}</div>
     {{ end }}
 
-    {{ $conversationCtas := index hugo.Data "conversation-ctas" }}
-    {{ $conversationCta := index $conversationCtas "work" }}
-    {{ if or (not hugo.IsProduction) (partial "conversation-cta-approved.html" $conversationCta) }}
-      {{ partial "conversation-cta.html" $conversationCta }}
-    {{ end }}
+    {{ partial "reviewable-conversation-cta.html" "work" }}
   </article>
 {{ end }}

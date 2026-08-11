@@ -1,0 +1,10 @@
+copy_email:
+  label: "Copy email"
+  success_message: "Email copied"
+  failure_message: "Copy unavailable. Select and copy %s manually."
+  manual_message: "Select and copy %s manually."
+  publication:
+    status: "review"
+    reviewed_by: ""
+    reviewed_at: ""
+    privacy_reviewed: false

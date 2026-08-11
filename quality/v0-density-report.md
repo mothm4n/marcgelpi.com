@@ -41,4 +41,4 @@ This records implementation verification, not editorial approval by Marc.
 - Body copy remains at its existing readable size. Acceptance coverage limits primary desktop measures to 80 characters and body line height to 1.5–2.
 - Automated browser coverage checks every public V0 route at 320 px, 390 px, and 1440 px, including WCAG text-spacing overrides and page-level overflow.
 - Representative before/after screenshots were reviewed from `output/quality/before/` and `output/quality/after/`.
-- The CTA copy remains in `review` state and is excluded from production until Marc reviews the rendered mobile and desktop captures and the approval record is completed.
+- The CTA copy and secondary Copy email action remain in `review` state and are excluded from production until Marc reviews the rendered mobile and desktop captures and the approval records are completed.

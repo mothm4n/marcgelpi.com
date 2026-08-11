@@ -88,10 +88,6 @@
       </div>
     </section>
 
-    {{ $conversationCtas := index hugo.Data "conversation-ctas" }}
-    {{ $conversationCta := index $conversationCtas "about" }}
-    {{ if or (not hugo.IsProduction) (partial "conversation-cta-approved.html" $conversationCta) }}
-      {{ partial "conversation-cta.html" $conversationCta }}
-    {{ end }}
+    {{ partial "reviewable-conversation-cta.html" "about" }}
   </article>
 {{ end }}

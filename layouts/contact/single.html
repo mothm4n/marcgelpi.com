@@ -1,4 +1,7 @@
 {{ define "main" }}
+  {{ $contactActions := index hugo.Data "contact-actions" }}
+  {{ $copyEmail := index $contactActions "copy_email" }}
+  {{ $copyEmailReviewable := or (not hugo.IsProduction) (partial "publication-record-approved.html" $copyEmail) }}
   <article class="contact-shell" aria-labelledby="contact-title">
     <header class="contact-hero">
       <p class="eyebrow">Contact</p>
@@ -9,11 +12,19 @@
           <span>Email Marc at <span data-contact-email-address>{{ site.Params.contact.email }}</span></span>
           <span aria-hidden="true">↘</span>
         </a>
-        <div class="contact-copy-row">
-          <button type="button" class="contact-copy" data-copy-email data-email="{{ site.Params.contact.email }}">Copy email</button>
-          <p class="contact-copy-status" role="status" aria-live="polite" aria-atomic="true" data-copy-email-status></p>
-        </div>
-        <noscript><p class="contact-copy-manual">Select and copy {{ site.Params.contact.email }} manually.</p></noscript>
+        {{ if $copyEmailReviewable }}
+          <div class="contact-copy-row">
+            <button
+              type="button"
+              class="contact-copy"
+              data-copy-email
+              data-email="{{ site.Params.contact.email }}"
+              data-success-message="{{ $copyEmail.success_message }}"
+              data-failure-message="{{ printf $copyEmail.failure_message site.Params.contact.email }}">{{ $copyEmail.label }}</button>
+            <p class="contact-copy-status" role="status" aria-live="polite" aria-atomic="true" data-copy-email-status></p>
+          </div>
+          <noscript><p class="contact-copy-manual">{{ printf $copyEmail.manual_message site.Params.contact.email }}</p></noscript>
+        {{ end }}
       </div>
     </header>
 
@@ -40,6 +51,8 @@
     </section>
   </article>
 
-  {{ $contactScript := resources.Get "js/contact.js" | minify | fingerprint }}
-  <script src="{{ $contactScript.RelPermalink }}" integrity="{{ $contactScript.Data.Integrity }}" defer></script>
+  {{ if $copyEmailReviewable }}
+    {{ $contactScript := resources.Get "js/contact.js" | minify | fingerprint }}
+    <script src="{{ $contactScript.RelPermalink }}" integrity="{{ $contactScript.Data.Integrity }}" defer></script>
+  {{ end }}
 {{ end }}

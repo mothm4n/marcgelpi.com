@@ -1,0 +1,5 @@
+{{ $conversationCtas := index hugo.Data "conversation-ctas" }}
+{{ $conversationCta := index $conversationCtas . }}
+{{ if or (not hugo.IsProduction) (partial "publication-record-approved.html" $conversationCta) }}
+  {{ partial "conversation-cta.html" $conversationCta }}
+{{ end }}

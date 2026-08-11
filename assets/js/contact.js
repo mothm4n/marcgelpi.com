@@ -4,6 +4,8 @@ const copyEmailStatus = document.querySelector("[data-copy-email-status]");
 if (copyEmailButton && copyEmailStatus) {
   copyEmailButton.addEventListener("click", async () => {
     const email = copyEmailButton.dataset.email;
+    const successMessage = copyEmailButton.dataset.successMessage;
+    const failureMessage = copyEmailButton.dataset.failureMessage;
 
     try {
       if (!navigator.clipboard?.writeText) {
@@ -11,9 +13,9 @@ if (copyEmailButton && copyEmailStatus) {
       }
 
       await navigator.clipboard.writeText(email);
-      copyEmailStatus.textContent = "Email copied";
+      copyEmailStatus.textContent = successMessage;
     } catch {
-      copyEmailStatus.textContent = `Copy unavailable. Select and copy ${email} manually.`;
+      copyEmailStatus.textContent = failureMessage;
     }
   });
 }
