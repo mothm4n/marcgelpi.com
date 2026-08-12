@@ -369,7 +369,7 @@
 
   .about-strengths li,
   .about-strengths li:nth-child(even) {
-    padding-block: 1.1rem;
+    padding-block: 0.85rem;
   }
 
   .about-career li {

@@ -12,9 +12,13 @@ bash "$acceptance_repo_root/scripts/build-production.sh" "$production_site" >/de
 acceptance_browser_start_and_open "$production_site" "/"
 
 acceptance_browser_assert_eval \
-  "the approved homepage revision is rendered by the production build" \
-  "document.querySelector('[data-home-section="selected-work"]') !== null" \
-  "true"
+  "the current approved homepage remains public while the complete revision is reviewed" \
+  "Array.from(document.querySelectorAll('main > [data-home-section]')).map(section => section.dataset.homeSection).join('|')" \
+  '"hero|selected-work|how-i-work|conversation"'
+
+acceptance_stop_server
+acceptance_browser_build_preview "$acceptance_browser_site_dir"
+acceptance_browser_start_and_open "$acceptance_browser_site_dir" "/"
 
 acceptance_browser_assert_eval \
   "the homepage uses the approved descriptor, thesis, and primary actions" \
@@ -22,13 +26,18 @@ acceptance_browser_assert_eval \
   "true"
 
 acceptance_browser_assert_eval \
-  "the editorial journey omits retired Writing and Resources features" \
+  "the reviewable editorial journey follows the complete section order" \
   "Array.from(document.querySelectorAll('main > [data-home-section]')).map(section => section.dataset.homeSection).join('|')" \
-  '"hero|selected-work|how-i-work|conversation"'
+  '"hero|selected-work|how-i-work|latest-writing|selected-resources|conversation"'
 
 acceptance_browser_assert_eval \
-  "selected content connects the currently active homepage journeys" \
-  "(() => { const hrefs = new Set(Array.from(document.querySelectorAll('main a')).map(link => link.getAttribute('href'))); return ['/work/adevinta/', '/about/', '/contact/'].every(path => hrefs.has(path)) && !hrefs.has('/writing/people-first-and-performance/') && !hrefs.has('/resources/system-diagnosis/'); })()" \
+  "selected content connects every approved homepage journey" \
+  "(() => { const hrefs = new Set(Array.from(document.querySelectorAll('main a')).map(link => link.getAttribute('href'))); return ['/work/adevinta/', '/about/', '/writing/life-isnt-always-a-river/', '/resources/how-to-sell-okrs/', '/contact/'].every(path => hrefs.has(path)) && !hrefs.has('/writing/people-first-and-performance/') && !hrefs.has('/resources/system-diagnosis/'); })()" \
+  "true"
+
+acceptance_browser_assert_eval \
+  "latest Writing and the editorially selected Resource reuse approved content" \
+  "(() => { const writing = document.querySelector('[data-home-section=\"latest-writing\"]'); const resource = document.querySelector('[data-home-section=\"selected-resources\"]'); return writing?.querySelector('a')?.getAttribute('href') === '/writing/life-isnt-always-a-river/' && writing?.querySelector('h2')?.textContent.trim() === 'Latest writing' && writing?.querySelector('h3')?.textContent.trim() === 'Life isn’t always a river' && writing?.textContent.includes('Product decisions change. That doesn’t always mean they were wrong.') && resource?.querySelector('a')?.getAttribute('href') === '/resources/how-to-sell-okrs/' && resource?.querySelector('h2')?.textContent.trim() === 'Selected resources' && resource?.querySelector('h3')?.textContent.trim() === 'How to sell OKRs internally' && resource?.textContent.includes('A practical case for focus, alignment, accountability and ambitious learning'); })()" \
   "true"
 
 acceptance_browser_assert_eval \
@@ -67,6 +76,12 @@ acceptance_browser_assert_eval \
   "(() => ['selected-work', 'how-i-work'].every(name => { const section = document.querySelector('[data-home-section=\"' + name + '\"]'); return section && parseFloat(getComputedStyle(section).paddingTop) < 120; }))()" \
   "true"
 
+"$acceptance_playwright_cli" --session "$acceptance_browser_session" resize 1440 900 >/dev/null
+acceptance_browser_assert_eval \
+  "the desktop navigation and hero fit below 900 pixels without clipping the title" \
+  "(() => { const header = document.querySelector('.site-header'); const hero = document.querySelector('[data-home-section=\"hero\"]'); const title = hero?.querySelector('h1'); const heroBox = hero?.getBoundingClientRect(); const titleBox = title?.getBoundingClientRect(); return header && heroBox && titleBox && heroBox.bottom < 900 && titleBox.top >= heroBox.top && titleBox.bottom <= heroBox.bottom && getComputedStyle(title).overflow !== 'hidden'; })()" \
+  "true"
+
 acceptance_browser_assert_eval \
   "the editorial homepage fits a desktop viewport" \
   "document.documentElement.scrollWidth <= document.documentElement.clientWidth" \
@@ -77,10 +92,20 @@ acceptance_browser_assert_eval \
   "(() => Array.from(document.querySelectorAll('[data-home-section="hero"] a')).every(link => { link.focus(); const style = getComputedStyle(link); return document.activeElement === link && style.outlineStyle !== 'none' && parseFloat(style.outlineWidth) > 0; }))()" \
   "true"
 
+acceptance_browser_assert_eval \
+  "the new homepage features expose visible keyboard focus" \
+  "(() => Array.from(document.querySelectorAll('[data-home-section=\"latest-writing\"] a, [data-home-section=\"selected-resources\"] a')).every(link => { link.focus(); const style = getComputedStyle(link); return document.activeElement === link && style.outlineStyle !== 'none' && parseFloat(style.outlineWidth) > 0; }))()" \
+  "true"
+
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" resize 390 844 >/dev/null
 acceptance_browser_assert_eval \
   "the editorial homepage fits a mobile viewport" \
   "document.documentElement.scrollWidth <= document.documentElement.clientWidth" \
+  "true"
+
+acceptance_browser_assert_eval \
+  "the new homepage features stack their content for a mobile reader" \
+  "(() => ['latest-writing', 'selected-resources'].every(name => { const link = document.querySelector('[data-home-section=\"' + name + '\"] .home-feature-link'); const copy = link?.querySelector('.home-feature-copy'); return link && copy && getComputedStyle(link).gridTemplateColumns.split(' ').length === 2 && copy.getBoundingClientRect().width < link.getBoundingClientRect().width; }))()" \
   "true"
 
 echo "PASS: complete editorial homepage journey"

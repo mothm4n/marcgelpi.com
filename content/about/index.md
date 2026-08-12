@@ -5,7 +5,7 @@ draft: false
 publication:
   status: "approved"
   reviewed_by: "Marc Gelpí"
-  reviewed_at: "2026-08-09"
+  reviewed_at: "2026-08-12"
   privacy_reviewed: true
 career_history_complete: true
 values:
@@ -16,16 +16,16 @@ values:
   - "Actions speak louder than words"
   - "Always align what I think&feel, what I say and what I do"
 strengths:
-  - title: "Strategic thinking"
-    description: "I spot relevant patterns, compare alternative paths, and choose a practical way forward."
+  - title: "Relator"
+    description: "I build trust through close, genuine relationships and do my best work when people can rely on one another."
+  - title: "Strategic"
+    description: "I quickly spot relevant patterns, compare alternative paths, and choose a practical way forward."
   - title: "Analytical"
-    description: "I look for reasons, causes, and the factors that can change a situation before drawing conclusions."
+    description: "I test assumptions against evidence, looking for causes and the factors that can change a situation."
   - title: "Ideation"
-    description: "I connect ideas that may appear unrelated and turn those connections into useful possibilities."
-  - title: "Relationship building"
-    description: "I connect individual talents to collective goals, building trust, autonomy, and sustainable change."
-  - title: "Responsibility"
-    description: "I take ownership for what I commit to and stay with the work until it has genuinely moved forward."
+    description: "I connect ideas that may appear unrelated and use those connections to create useful possibilities."
+  - title: "Individualization"
+    description: "I notice what is distinctive in each person and shape roles and collaboration around how people do their best work."
 earlier_career:
   title: "Earlier product and technology roles"
   description: "Before Agile coaching, I worked across development, product, design, entrepreneurship, and leadership positions—the same kinds of roles and tensions I now help connect."

@@ -71,8 +71,8 @@ acceptance_browser_assert_eval \
   "true"
 
 acceptance_browser_assert_eval \
-  "the current homepage does not promote retired Writing" \
-  "fetch('/').then(response => response.text()).then(html => !html.includes('/writing/people-first-and-performance/') && !html.includes('data-home-section=\"latest-writing\"'))" \
+  "the homepage promotes the latest approved Writing without restoring retired content" \
+  "fetch('/').then(response => response.text()).then(html => html.includes('data-home-section=\"latest-writing\"') && html.includes('/writing/life-isnt-always-a-river/') && !html.includes('/writing/people-first-and-performance/') && !html.includes('/writing/older-article/'))" \
   "true"
 
 acceptance_browser_assert_eval \
