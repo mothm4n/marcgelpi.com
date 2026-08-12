@@ -55,21 +55,6 @@ button:focus-visible {
   outline-offset: 0.28rem;
 }
 
-.skip-link {
-  position: fixed;
-  z-index: 100;
-  top: 0.75rem;
-  left: 0.75rem;
-  padding: 0.65rem 0.9rem;
-  transform: translateY(-180%);
-  background: var(--charcoal);
-  color: var(--paper);
-}
-
-.skip-link:focus {
-  transform: translateY(0);
-}
-
 .visually-hidden {
   position: absolute;
   width: 1px;

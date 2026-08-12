@@ -73,7 +73,6 @@ acceptance_browser_assert_eval \
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" reload >/dev/null
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" press Tab >/dev/null
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" press Tab >/dev/null
-"$acceptance_playwright_cli" --session "$acceptance_browser_session" press Tab >/dev/null
 
 acceptance_browser_assert_eval \
   "desktop navigation is reachable by keyboard" \
@@ -93,7 +92,6 @@ acceptance_browser_assert_eval \
   "getComputedStyle(document.querySelector('[data-mobile-navigation]')).display !== 'none'" \
   "true"
 
-"$acceptance_playwright_cli" --session "$acceptance_browser_session" press Tab >/dev/null
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" press Tab >/dev/null
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" press Tab >/dev/null
 
@@ -149,7 +147,6 @@ for viewport in "320 800" "390 844"; do
 
     "$acceptance_playwright_cli" --session "$acceptance_browser_session" open "http://127.0.0.1:$acceptance_browser_server_port$source_path" >/dev/null
     "$acceptance_playwright_cli" --session "$acceptance_browser_session" resize "$viewport_width" "$viewport_height" >/dev/null
-    "$acceptance_playwright_cli" --session "$acceptance_browser_session" press Tab >/dev/null
     "$acceptance_playwright_cli" --session "$acceptance_browser_session" press Tab >/dev/null
     "$acceptance_playwright_cli" --session "$acceptance_browser_session" press Tab >/dev/null
     "$acceptance_playwright_cli" --session "$acceptance_browser_session" press Enter >/dev/null
