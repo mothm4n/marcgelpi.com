@@ -63,8 +63,8 @@ acceptance_browser_assert_eval \
   "true"
 
 acceptance_browser_assert_eval \
-  "the current homepage does not promote the retired resource" \
-  "fetch('/').then(response => response.text()).then(html => !html.includes('/resources/system-diagnosis/') && !html.includes('data-home-section=\"selected-resources\"'))" \
+  "the homepage promotes the editorially selected Resource without restoring retired or review-only content" \
+  "fetch('/').then(response => response.text()).then(html => html.includes('data-home-section=\"selected-resources\"') && html.includes('/resources/how-to-sell-okrs/') && !html.includes('/resources/system-diagnosis/') && !html.includes('/resources/review-resource/'))" \
   "true"
 
 acceptance_browser_assert_eval \

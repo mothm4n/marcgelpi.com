@@ -3,6 +3,28 @@
 {{ $photo800 := $photo.Fill "800x1000 Center webp q84" }}
 {{ $photo1200 := $photo.Fill "1200x1500 Center webp q84" }}
 {{ $workPaths := slice "/work/adevinta" "/work/protected-autonomy" "/work/preparing-to-scale" }}
+{{ $latestWriting := false }}
+{{ range where site.RegularPages.ByDate.Reverse "Section" "writing" }}
+  {{ if and (not $latestWriting) (partial "publication-record-approved.html" .Params) }}
+    {{ $latestWriting = . }}
+  {{ end }}
+{{ end }}
+{{ $selectedResource := false }}
+{{ with .Params.homepage.selected_resource }}
+  {{ $selectedResource = site.GetPage . }}
+{{ end }}
+{{ if and hugo.IsProduction (not $latestWriting) }}
+  {{ errorf "The approved homepage requires at least one approved Writing page" }}
+{{ end }}
+{{ if and hugo.IsProduction (not $selectedResource) }}
+  {{ errorf "The approved homepage selected Resource does not exist" }}
+{{ end }}
+{{ if and $selectedResource (ne $selectedResource.Section "resources") }}
+  {{ errorf "The homepage selected Resource %q must belong to the Resources section" $selectedResource.Path }}
+{{ end }}
+{{ if and hugo.IsProduction $selectedResource (not (partial "publication-record-approved.html" $selectedResource.Params)) }}
+  {{ errorf "The approved homepage selected Resource %q is not approved" $selectedResource.Path }}
+{{ end }}
 
 <section class="home-hero" aria-labelledby="home-title" data-home-section="hero">
   <div class="home-hero-copy">
@@ -74,6 +96,46 @@
   </ol>
   <a class="text-link" href="/about/">Read the story behind the practice <span aria-hidden="true">↗</span></a>
 </section>
+
+{{ with $latestWriting }}
+  <section class="home-feature home-writing" aria-labelledby="home-writing-title" data-home-section="latest-writing">
+    <header class="home-section-heading numbered-section">
+      <p class="section-number" aria-hidden="true">03</p>
+      <div>
+        <h2 id="home-writing-title">Latest writing</h2>
+      </div>
+    </header>
+    <a class="home-feature-link" href="{{ .RelPermalink }}">
+      {{ partial "editorial-date.html" .Date }}
+      <div class="home-feature-copy">
+        <h3>{{ .Title }}</h3>
+        <span>{{ .Description }}</span>
+      </div>
+      <span class="home-item-arrow" aria-hidden="true">↘</span>
+    </a>
+  </section>
+{{ end }}
+
+{{ with $selectedResource }}
+  {{ if partial "publication-record-approved.html" .Params }}
+    <section class="home-feature home-resources" aria-labelledby="home-resources-title" data-home-section="selected-resources">
+      <header class="home-section-heading numbered-section">
+        <p class="section-number" aria-hidden="true">04</p>
+        <div>
+          <h2 id="home-resources-title">Selected resources</h2>
+        </div>
+      </header>
+      <a class="home-feature-link" href="{{ .RelPermalink }}">
+        <span class="home-item-meta">{{ .Params.resource_label }}</span>
+        <div class="home-feature-copy">
+          <h3>{{ .Title }}</h3>
+          <span>{{ .Description }}</span>
+        </div>
+        <span class="home-item-arrow" aria-hidden="true">↘</span>
+      </a>
+    </section>
+  {{ end }}
+{{ end }}
 
 <section class="home-conversation" aria-labelledby="home-conversation-title" data-home-section="conversation">
   <p class="eyebrow">Have a real problem in mind?</p>

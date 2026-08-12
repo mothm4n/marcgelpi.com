@@ -11,7 +11,7 @@ acceptance_browser_build_preview "$acceptance_browser_site_dir"
 acceptance_browser_start_and_open "$acceptance_browser_site_dir" "/"
 
 density_targets=(
-  "Home|/|4270"
+  "Home|/|5220"
   "Work|/work/|1704"
   "About|/about/|6203"
   "Adevinta case|/work/adevinta/|4447"
@@ -51,4 +51,4 @@ for readable_route in "${readable_routes[@]}"; do
     "true"
 done
 
-echo "PASS: measured V0 information density"
+echo "PASS: measured V1 information density"

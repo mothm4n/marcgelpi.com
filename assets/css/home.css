@@ -85,7 +85,8 @@
 }
 
 .home-work,
-.home-method {
+.home-method,
+.home-feature {
   padding: clamp(3.5rem, 6vw, 6.5rem) var(--page-gutter);
   border-bottom: 1px solid var(--line);
 }
@@ -151,6 +152,67 @@
 
 .home-method {
   background: var(--paper);
+}
+
+.home-writing {
+  background: var(--charcoal);
+  color: var(--paper);
+}
+
+.home-writing .home-section-heading .section-number,
+.home-writing .home-feature-link time {
+  color: #d98a68;
+}
+
+.home-resources {
+  background: var(--paper);
+}
+
+.home-feature-link {
+  display: grid;
+  grid-template-columns: minmax(10rem, 0.28fr) minmax(0, 1fr) auto;
+  gap: 1.5rem clamp(2rem, 5vw, 5rem);
+  align-items: start;
+  padding: clamp(1.8rem, 4vw, 3.5rem) 0;
+  border-top: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  text-decoration: none;
+  transition: color 180ms ease, padding-inline 180ms ease;
+}
+
+.home-feature-link:hover,
+.home-feature-link:focus-visible {
+  padding-inline: 0.75rem;
+  color: var(--copper);
+}
+
+.home-writing .home-feature-link:hover,
+.home-writing .home-feature-link:focus-visible {
+  color: #e6a88d;
+}
+
+.home-feature-copy {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.home-feature-copy h3 {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(2rem, 4.5vw, 4.75rem);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 0.95;
+}
+
+.home-feature-copy > span {
+  max-width: 42rem;
+  color: var(--muted);
+  font-size: clamp(1rem, 1.5vw, 1.2rem);
+}
+
+.home-writing .home-feature-copy > span {
+  color: #d7d0c6;
 }
 
 .home-method > ol {
@@ -233,6 +295,35 @@
   margin-top: 1.5rem;
 }
 
+@media (min-width: 50.001rem) {
+  .home-hero {
+    min-height: min(calc(100svh - var(--header-height) - 0.75rem), 50rem);
+  }
+}
+
+@media (min-width: 50.001rem) and (max-height: 56.25rem) {
+  .home-hero-copy {
+    padding-block: clamp(2.5rem, 5vh, 4rem);
+  }
+
+  .home-hero h1 {
+    font-size: clamp(3.5rem, 8.8vh, 5.75rem);
+  }
+
+  .home-thesis {
+    margin-top: 1.75rem;
+    font-size: clamp(1.2rem, 2.7vh, 1.6rem);
+  }
+
+  .home-actions {
+    margin-top: 1.5rem;
+  }
+
+  .home-portrait {
+    min-height: 0;
+  }
+}
+
 @media (max-width: 62rem) {
   .home-work-list a {
     grid-template-columns: minmax(9rem, 0.35fr) minmax(0, 1fr) auto;
@@ -302,8 +393,23 @@
   }
 
   .home-work,
-  .home-method {
+  .home-method,
+  .home-feature {
     padding-block: 2.75rem;
+  }
+
+  .home-feature-link {
+    grid-template-columns: 1fr auto;
+    gap: 1.5rem;
+  }
+
+  .home-feature-link time,
+  .home-feature-link .home-item-meta {
+    grid-column: 1 / -1;
+  }
+
+  .home-feature-copy {
+    grid-column: 1;
   }
 
   .home-conversation {
