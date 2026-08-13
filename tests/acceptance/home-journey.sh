@@ -12,9 +12,9 @@ bash "$acceptance_repo_root/scripts/build-production.sh" "$production_site" >/de
 acceptance_browser_start_and_open "$production_site" "/"
 
 acceptance_browser_assert_eval \
-  "the current approved homepage remains public while the complete revision is reviewed" \
+  "the production build contains the approved complete homepage" \
   "Array.from(document.querySelectorAll('main > [data-home-section]')).map(section => section.dataset.homeSection).join('|')" \
-  '"hero|selected-work|how-i-work|conversation"'
+  '"hero|selected-work|how-i-work|latest-writing|selected-resources|conversation"'
 
 acceptance_stop_server
 acceptance_browser_build_preview "$acceptance_browser_site_dir"

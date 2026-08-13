@@ -41,4 +41,4 @@ for public_path in "${public_paths[@]}"; do
     "true"
 done
 
-echo "PASS: public V0 responsive quality"
+echo "PASS: public V1 responsive quality"
