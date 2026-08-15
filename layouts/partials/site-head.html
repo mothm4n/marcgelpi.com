@@ -10,7 +10,7 @@
 {{ $pageDescription := .Description | default site.Params.description }}
 {{ if eq .Kind "404" }}{{ $pageDescription = printf "The requested page could not be found on %s’s site." site.Params.author.name }}{{ end }}
 {{ $searchDescription := $pageDescription }}
-{{ if and .IsHome .Params.seo_description }}{{ $searchDescription = .Params.seo_description }}{{ end }}
+{{ with .Params.seo_description }}{{ $searchDescription = . }}{{ end }}
 {{ $openGraphType := "website" }}
 {{ if and .IsPage (in (slice "work" "writing" "resources") .Section) }}{{ $openGraphType = "article" }}{{ end }}
 {{ if eq .RelPermalink "/about/" }}{{ $openGraphType = "profile" }}{{ end }}

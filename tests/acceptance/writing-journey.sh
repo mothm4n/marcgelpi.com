@@ -49,8 +49,8 @@ acceptance_browser_assert_eval \
   "true"
 
 acceptance_browser_assert_eval \
-  "the approved article publishes accurate metadata" \
-  "document.title === 'Life isn’t always a river · Marc Gelpí' && document.querySelector('link[rel=canonical]')?.href === 'https://marcgelpi.com/writing/life-isnt-always-a-river/' && document.querySelector('meta[property=\"og:type\"]')?.content === 'article' && document.querySelector('.writing-article-meta')?.textContent.includes('4 min read')" \
+  "the approved article separates search metadata from visible and social copy" \
+  "document.title === 'Life isn’t always a river · Marc Gelpí' && document.querySelector('meta[name=\"description\"]')?.content === 'A changed product decision is not automatically a bad one. See how visible reasoning helps teams distinguish learning from chaos.' && document.querySelector('.writing-article-deck')?.textContent.trim() === 'Product decisions change. That doesn’t always mean they were wrong.' && document.querySelector('meta[property=\"og:description\"]')?.content === 'Product decisions change. That doesn’t always mean they were wrong.' && document.querySelector('meta[name=\"twitter:description\"]')?.content === 'Product decisions change. That doesn’t always mean they were wrong.' && document.querySelector('link[rel=canonical]')?.href === 'https://marcgelpi.com/writing/life-isnt-always-a-river/' && document.querySelector('meta[property=\"og:type\"]')?.content === 'article' && document.querySelector('.writing-article-meta')?.textContent.includes('4 min read')" \
   "true"
 
 acceptance_browser_assert_eval \

@@ -1,6 +1,7 @@
 ---
 title: "Life isn’t always a river"
 description: "Product decisions change. That doesn’t always mean they were wrong."
+seo_description: "A changed product decision is not automatically a bad one. See how visible reasoning helps teams distinguish learning from chaos."
 date: 2026-06-01T08:00:00+02:00
 draft: false
 publication:
