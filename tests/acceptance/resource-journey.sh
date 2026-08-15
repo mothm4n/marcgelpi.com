@@ -14,7 +14,6 @@ acceptance_contains 'status: "review"' "$resource_archetype" || acceptance_fail 
 acceptance_contains 'privacy_reviewed: false' "$resource_archetype" || acceptance_fail "Resources archetype must require a privacy review"
 
 resource_shelf_expression="(async () => { const main = document.querySelector('main'); const links = Array.from(main?.querySelectorAll('ol a') ?? []); const retired = await fetch('/resources/system-diagnosis/'); return main?.querySelector('h1')?.textContent.trim() === 'Resources' && links.length === 1 && links[0]?.getAttribute('href') === '/resources/how-to-sell-okrs/' && links[0]?.querySelector('strong')?.textContent.trim() === 'How to sell OKRs internally' && !main?.textContent.includes('The 15-minute system diagnosis') && !/coming soon|sign up|subscribe|newsletter|fake download/i.test(main?.textContent ?? '') && retired.status === 404; })()"
-resource_shelf_quality_expression="(() => { const main = document.querySelector('main'); const headings = Array.from(main?.querySelectorAll('h1, h2, h3, h4, h5, h6') ?? []); const levels = headings.map(heading => Number(heading.tagName.slice(1))); return headings.filter(heading => heading.tagName === 'H1').length === 1 && levels.every((level, index) => index === 0 || level <= levels[index - 1] + 1) && document.documentElement.scrollWidth <= document.documentElement.clientWidth; })()"
 
 fixture_content="$acceptance_browser_tmp/content"
 cp -R "$acceptance_repo_root/content/." "$fixture_content/"
@@ -43,13 +42,13 @@ acceptance_browser_assert_eval \
 
 acceptance_browser_assert_eval \
   "the approved Resources context retains its heading structure without desktop overflow" \
-  "$resource_shelf_quality_expression" \
+  "$acceptance_editorial_index_quality_expression" \
   "true"
 
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" resize 390 844 >/dev/null
 acceptance_browser_assert_eval \
   "the approved Resources context retains its heading structure without mobile overflow" \
-  "$resource_shelf_quality_expression" \
+  "$acceptance_editorial_index_quality_expression" \
   "true"
 
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" open "http://127.0.0.1:$acceptance_browser_server_port/resources/how-to-sell-okrs/" >/dev/null
@@ -92,13 +91,13 @@ acceptance_browser_assert_eval \
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" resize 1440 1000 >/dev/null
 acceptance_browser_assert_eval \
   "the Resources shelf fits a desktop viewport" \
-  "$resource_shelf_quality_expression" \
+  "$acceptance_editorial_index_quality_expression" \
   "true"
 
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" resize 390 844 >/dev/null
 acceptance_browser_assert_eval \
   "the Resources shelf fits a mobile viewport" \
-  "$resource_shelf_quality_expression" \
+  "$acceptance_editorial_index_quality_expression" \
   "true"
 
 echo "PASS: Resources shelf ready for Marc's next resource"

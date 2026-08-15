@@ -8,6 +8,7 @@ acceptance_browser_server_log=""
 acceptance_browser_server_port=""
 acceptance_browser_session=""
 acceptance_playwright_cli=""
+acceptance_editorial_index_quality_expression="(() => { const main = document.querySelector('main'); const headings = Array.from(main?.querySelectorAll('h1, h2, h3, h4, h5, h6') ?? []); const levels = headings.map(heading => Number(heading.tagName.slice(1))); return headings.filter(heading => heading.tagName === 'H1').length === 1 && levels.every((level, index) => index === 0 || level <= levels[index - 1] + 1) && document.documentElement.scrollWidth <= document.documentElement.clientWidth; })()"
 
 acceptance_fail() {
   echo "FAIL: $1" >&2
