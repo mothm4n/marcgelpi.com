@@ -9,4 +9,4 @@ publication:
   privacy_reviewed: true
 ---
 
-Concise arguments first, with deeper reasoning available when it earns the reader's time.
+I write about organizational effectiveness and ways of working; alignment, governance and decision-making; and evidence-based organizational change. Start with [why changing a product decision does not prove the original choice was wrong](/writing/life-isnt-always-a-river/).

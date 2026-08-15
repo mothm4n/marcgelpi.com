@@ -16,6 +16,7 @@ if grep -Fq '<!--more-->' "$writing_archetype"; then
 fi
 
 article_content_expression="(() => { const main = document.querySelector('main'); const body = main?.querySelector('.writing-body'); const headings = Array.from(body?.querySelectorAll('h2') ?? []).map(heading => heading.firstChild?.textContent.trim()); const source = body?.querySelector('a[href=\"https://www.oliverburkeman.com/meditationsformortals\"]'); return main?.querySelector('h1')?.textContent.trim() === 'Life isn’t always a river' && main?.querySelector('.writing-article-deck')?.textContent.trim() === 'Product decisions change. That doesn’t always mean they were wrong.' && main?.querySelector('time')?.getAttribute('datetime') === '2026-06-01' && body?.textContent.includes('We want meaning. We want coherence. We want the river to actually mean something.') && headings[0] === 'Why it matters' && headings.at(-1) === 'A useful principle' && source?.textContent.trim() === 'Meditations for Mortals' && main?.querySelector('details, aside, progress, [data-comments], [data-tags], [data-categories], [data-filters], nav[aria-label=\"On this page\"]') === null; })()"
+writing_index_quality_expression="(() => { const main = document.querySelector('main'); const headings = Array.from(main?.querySelectorAll('h1, h2, h3, h4, h5, h6') ?? []); const levels = headings.map(heading => Number(heading.tagName.slice(1))); return headings.filter(heading => heading.tagName === 'H1').length === 1 && levels.every((level, index) => index === 0 || level <= levels[index - 1] + 1) && document.documentElement.scrollWidth <= document.documentElement.clientWidth; })()"
 
 production_site="$acceptance_browser_tmp/production-site"
 bash "$acceptance_repo_root/scripts/build-production.sh" "$production_site" >/dev/null
@@ -26,8 +27,19 @@ bash "$acceptance_repo_root/scripts/build-production.sh" "$production_site" >/de
 
 acceptance_browser_start_and_open "$production_site" "/writing/"
 acceptance_browser_assert_eval \
-  "the approved Writing archive exposes exactly the first article" \
-  "(() => { const main = document.querySelector('main'); const links = Array.from(main?.querySelectorAll('ol a') ?? []); return main?.querySelector('h1')?.textContent.trim() === 'Writing' && links.length === 1 && links[0]?.getAttribute('href') === '/writing/life-isnt-always-a-river/' && links[0]?.querySelector('strong')?.textContent.trim() === 'Life isn’t always a river' && !main?.textContent.includes('Blog'); })()" \
+  "the approved Writing orientation leads into the unchanged chronological archive" \
+  "(() => { const main = document.querySelector('main'); const introduction = main?.querySelector('.editorial-index-introduction'); const orientationLink = introduction?.querySelector('a'); const archiveLinks = Array.from(main?.querySelectorAll('ol a') ?? []); const dates = archiveLinks.map(link => link.querySelector('time')?.getAttribute('datetime')); const expectedIntroduction = 'I write about organizational effectiveness and ways of working; alignment, governance and decision-making; and evidence-based organizational change. Start with why changing a product decision does not prove the original choice was wrong.'; orientationLink?.focus(); const focusStyle = orientationLink && getComputedStyle(orientationLink); return main?.querySelector('h1')?.textContent.trim() === 'Writing' && main?.querySelector('.editorial-index-deck')?.textContent.trim() === 'Notes on organizational effectiveness, decisions, and evidence-based change.' && introduction?.textContent.replace(/\\s+/g, ' ').trim() === expectedIntroduction && orientationLink?.textContent.trim() === 'why changing a product decision does not prove the original choice was wrong' && orientationLink?.getAttribute('href') === '/writing/life-isnt-always-a-river/' && document.activeElement === orientationLink && focusStyle.outlineStyle !== 'none' && parseFloat(focusStyle.outlineWidth) > 0 && archiveLinks.length === 1 && archiveLinks[0]?.getAttribute('href') === '/writing/life-isnt-always-a-river/' && archiveLinks[0]?.querySelector('strong')?.textContent.trim() === 'Life isn’t always a river' && dates.every((date, index) => index === 0 || date <= dates[index - 1]) && main?.querySelector('[data-tags], [data-categories], [data-filters], nav[aria-label="Topics"]') === null && !main?.textContent.includes('Blog'); })()" \
+  "true"
+
+acceptance_browser_assert_eval \
+  "the approved Writing orientation retains its heading structure without desktop overflow" \
+  "$writing_index_quality_expression" \
+  "true"
+
+"$acceptance_playwright_cli" --session "$acceptance_browser_session" resize 390 844 >/dev/null
+acceptance_browser_assert_eval \
+  "the approved Writing orientation retains its heading structure without mobile overflow" \
+  "$writing_index_quality_expression" \
   "true"
 
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" open "http://127.0.0.1:$acceptance_browser_server_port/writing/life-isnt-always-a-river/" >/dev/null
@@ -77,7 +89,7 @@ acceptance_browser_assert_eval \
 
 acceptance_browser_assert_eval \
   "the Writing shelf remains accessible and responsive" \
-  "(() => { const main = document.querySelector('main'); const headings = Array.from(main?.querySelectorAll('h1, h2, h3, h4, h5, h6') ?? []); const levels = headings.map(heading => Number(heading.tagName.slice(1))); return headings.filter(heading => heading.tagName === 'H1').length === 1 && levels.every((level, index) => index === 0 || level <= levels[index - 1] + 1) && document.documentElement.scrollWidth <= document.documentElement.clientWidth; })()" \
+  "$writing_index_quality_expression" \
   "true"
 
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" open "http://127.0.0.1:$acceptance_browser_server_port/writing/older-article/" >/dev/null
