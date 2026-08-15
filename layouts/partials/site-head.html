@@ -5,6 +5,8 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 {{ $pageTitle := printf "%s · %s" .Title site.Title }}
 {{ if .IsHome }}{{ $pageTitle = site.Title }}{{ end }}
+{{ $searchTitle := $pageTitle }}
+{{ if and .IsHome .Params.seo_title }}{{ $searchTitle = .Params.seo_title }}{{ end }}
 {{ $pageDescription := .Description | default site.Params.description }}
 {{ if eq .Kind "404" }}{{ $pageDescription = printf "The requested page could not be found on %s’s site." site.Params.author.name }}{{ end }}
 {{ $openGraphType := "website" }}
@@ -12,7 +14,7 @@
 {{ if eq .RelPermalink "/about/" }}{{ $openGraphType = "profile" }}{{ end }}
 {{ $socialSource := resources.Get site.Params.portrait.image }}
 {{ $socialImage := $socialSource.Fill "1200x630 Center webp q84" }}
-<title>{{ $pageTitle }}</title>
+<title>{{ $searchTitle }}</title>
 <meta name="description" content="{{ $pageDescription }}">
 <link rel="canonical" href="{{ .Permalink }}">
 <meta property="og:site_name" content="{{ site.Title }}">

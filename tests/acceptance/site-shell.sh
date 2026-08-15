@@ -49,8 +49,18 @@ acceptance_browser_assert_eval \
   '"https://marcgelpi.com/"'
 
 acceptance_browser_assert_eval \
+  "the homepage search title names Marc Gelpí's professional territory" \
+  "document.title" \
+  '"Organizational Effectiveness & Ways of Working | Marc Gelpí"'
+
+acceptance_browser_assert_eval \
+  "the homepage social-sharing title keeps Marc Gelpí's public identity" \
+  "(() => document.querySelector('meta[property=\"og:title\"]')?.content === 'Marc Gelpí' && document.querySelector('meta[name=\"twitter:title\"]')?.content === 'Marc Gelpí')()" \
+  "true"
+
+acceptance_browser_assert_eval \
   "the public identity preserves Marc Gelpí's name and monogram" \
-  "(() => { const mark = document.querySelector('.site-mark'); const footer = document.querySelector('.footer-mark'); return document.title === 'Marc Gelpí' && mark?.getAttribute('aria-label') === 'Marc Gelpí, home' && mark?.textContent.trim() === 'MG' && footer?.textContent.trim() === 'Marc Gelpí'; })()" \
+  "(() => { const mark = document.querySelector('.site-mark'); const footer = document.querySelector('.footer-mark'); return mark?.getAttribute('aria-label') === 'Marc Gelpí, home' && mark?.textContent.trim() === 'MG' && footer?.textContent.trim() === 'Marc Gelpí'; })()" \
   "true"
 
 acceptance_browser_assert_eval \
