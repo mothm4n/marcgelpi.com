@@ -9,13 +9,15 @@
 {{ if and .IsHome .Params.seo_title }}{{ $searchTitle = .Params.seo_title }}{{ end }}
 {{ $pageDescription := .Description | default site.Params.description }}
 {{ if eq .Kind "404" }}{{ $pageDescription = printf "The requested page could not be found on %s’s site." site.Params.author.name }}{{ end }}
+{{ $searchDescription := $pageDescription }}
+{{ if and .IsHome .Params.seo_description }}{{ $searchDescription = .Params.seo_description }}{{ end }}
 {{ $openGraphType := "website" }}
 {{ if and .IsPage (in (slice "work" "writing" "resources") .Section) }}{{ $openGraphType = "article" }}{{ end }}
 {{ if eq .RelPermalink "/about/" }}{{ $openGraphType = "profile" }}{{ end }}
 {{ $socialSource := resources.Get site.Params.portrait.image }}
 {{ $socialImage := $socialSource.Fill "1200x630 Center webp q84" }}
 <title>{{ $searchTitle }}</title>
-<meta name="description" content="{{ $pageDescription }}">
+<meta name="description" content="{{ $searchDescription }}">
 <link rel="canonical" href="{{ .Permalink }}">
 <meta property="og:site_name" content="{{ site.Title }}">
 <meta property="og:title" content="{{ $pageTitle }}">

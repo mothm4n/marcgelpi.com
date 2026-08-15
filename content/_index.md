@@ -1,6 +1,7 @@
 ---
 title: "Marc Gelpí"
 seo_title: "Organizational Effectiveness & Ways of Working | Marc Gelpí"
+seo_description: "Marc Gelpí helps product and technology leaders across Europe improve organizational effectiveness through people-first ways of working that scale."
 publication:
   status: "approved"
   reviewed_by: "Marc Gelpí"

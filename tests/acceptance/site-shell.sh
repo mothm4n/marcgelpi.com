@@ -54,6 +54,16 @@ acceptance_browser_assert_eval \
   '"Organizational Effectiveness & Ways of Working | Marc Gelpí"'
 
 acceptance_browser_assert_eval \
+  "the homepage search description names its audience and outcome" \
+  "document.querySelector('meta[name=\"description\"]')?.content" \
+  '"Marc Gelpí helps product and technology leaders across Europe improve organizational effectiveness through people-first ways of working that scale."'
+
+acceptance_browser_assert_eval \
+  "the homepage social-sharing description keeps the approved brand summary" \
+  "(() => document.querySelector('meta[property=\"og:description\"]')?.content === 'People-first organizational effectiveness and ways of working.' && document.querySelector('meta[name=\"twitter:description\"]')?.content === 'People-first organizational effectiveness and ways of working.')()" \
+  "true"
+
+acceptance_browser_assert_eval \
   "the homepage social-sharing title keeps Marc Gelpí's public identity" \
   "(() => document.querySelector('meta[property=\"og:title\"]')?.content === 'Marc Gelpí' && document.querySelector('meta[name=\"twitter:title\"]')?.content === 'Marc Gelpí')()" \
   "true"
