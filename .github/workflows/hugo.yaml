@@ -12,8 +12,9 @@ permissions:
   id-token: write
 
 concurrency:
+  # The desired published state is the latest commit on the publication branch.
   group: pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 defaults:
   run:

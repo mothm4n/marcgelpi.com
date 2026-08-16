@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "test": "npm run test:workflow && npm run test:acceptance",
-    "test:workflow": "bash tests/workflow/publication-timing.sh",
+    "test:workflow": "bash tests/workflow/run.sh",
     "test:acceptance": "bash tests/acceptance/run.sh"
   },
   "devDependencies": {
