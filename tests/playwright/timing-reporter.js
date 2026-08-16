@@ -1,5 +1,11 @@
 const fs = require('node:fs');
 
+function journeyName(title) {
+  return title === 'English production site shell'
+    ? 'site-shell'
+    : title.replace(/ journey$/, '').replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').toLowerCase();
+}
+
 class TimingReporter {
   onBegin() {
     if (process.env.PLAYWRIGHT_TIMINGS) {
@@ -12,9 +18,7 @@ class TimingReporter {
       return;
     }
 
-    const journey = test.title === 'English production site shell'
-      ? 'site-shell'
-      : test.title.replace(/ journey$/, '').replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').toLowerCase();
+    const journey = journeyName(test.title);
     const seconds = Math.max(1, Math.ceil(result.duration / 1000));
     fs.appendFileSync(process.env.PLAYWRIGHT_TIMINGS, `${journey}\t${seconds}\n`);
   }

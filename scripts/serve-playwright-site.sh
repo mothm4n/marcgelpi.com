@@ -36,6 +36,13 @@ if [[ -n "${PLAYWRIGHT_BUILD_REPORT:-}" ]]; then
   printf 'production\t1\npreview\t1\n' >"$PLAYWRIGHT_BUILD_REPORT"
 fi
 
+if [[ -n "${PLAYWRIGHT_ARTIFACT_REPORT:-}" ]]; then
+  printf 'production\t%s\npreview\t%s\n' \
+    "$production_directory" \
+    "$preview_directory" \
+    >"$PLAYWRIGHT_ARTIFACT_REPORT"
+fi
+
 python3 -m http.server "$server_port" \
   --bind 127.0.0.1 \
   --directory "$production_directory" &

@@ -1,6 +1,15 @@
+const os = require('node:os');
+const path = require('node:path');
 const { defineConfig } = require('playwright/test');
 
 const port = Number(process.env.SITE_TEST_PORT || 4173);
+
+if (!process.env.PLAYWRIGHT_ARTIFACT_REPORT) {
+  process.env.PLAYWRIGHT_ARTIFACT_REPORT = path.join(
+    os.tmpdir(),
+    `playwright-artifacts-${process.pid}.tsv`,
+  );
+}
 
 module.exports = defineConfig({
   testDir: './tests/playwright',
