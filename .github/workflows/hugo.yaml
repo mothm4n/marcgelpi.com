@@ -86,9 +86,11 @@ jobs:
       - name: Install browser acceptance dependencies
         run: |
           npm ci
-          npx playwright install --with-deps chromium
+          browser_install_log="${RUNNER_TEMP}/playwright-install.log"
+          npx playwright install --with-deps --only-shell chromium 2>&1 | tee "${browser_install_log}"
           finished_at=$(date +%s)
           bash scripts/publication-timing.sh record "${PUBLICATION_TIMINGS}" "Install browser acceptance dependencies" "${BROWSER_DEPS_STARTED_AT}" "${finished_at}"
+          bash scripts/summarize-browser-install.sh "${browser_install_log}" "${BROWSER_DEPS_STARTED_AT}" "${finished_at}" >>"${GITHUB_STEP_SUMMARY}"
           echo "ACCEPTANCE_STARTED_AT=${finished_at}" >>"${GITHUB_ENV}"
 
       - name: Test generated site
