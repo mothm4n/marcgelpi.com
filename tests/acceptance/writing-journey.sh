@@ -4,6 +4,7 @@ set -euo pipefail
 
 acceptance_directory=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 source "$acceptance_directory/helpers.sh"
+source "$acceptance_directory/contracts/writing.sh"
 acceptance_browser_setup "marcgelpi-writing" "${SITE_WRITING_TEST_PORT:-4179}" "marcgelpi-writing-$$"
 trap acceptance_browser_cleanup EXIT
 
@@ -28,13 +29,13 @@ acceptance_browser_assert_writing_orientation \
 
 acceptance_browser_assert_eval \
   "the approved Writing orientation retains its heading structure without desktop overflow" \
-  "$acceptance_page_quality_expression" \
+  "$acceptance_page_heading_and_overflow_expression" \
   "true"
 
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" resize 390 844 >/dev/null
 acceptance_browser_assert_eval \
   "the approved Writing orientation retains its heading structure without mobile overflow" \
-  "$acceptance_page_quality_expression" \
+  "$acceptance_page_heading_and_overflow_expression" \
   "true"
 
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" open "http://127.0.0.1:$acceptance_browser_server_port/writing/life-isnt-always-a-river/" >/dev/null
@@ -77,7 +78,7 @@ acceptance_browser_assert_eval \
 
 acceptance_browser_assert_eval \
   "the Writing shelf remains accessible and responsive" \
-  "$acceptance_page_quality_expression" \
+  "$acceptance_page_heading_and_overflow_expression" \
   "true"
 
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" open "http://127.0.0.1:$acceptance_browser_server_port/writing/older-article/" >/dev/null
@@ -93,10 +94,8 @@ acceptance_browser_assert_eval \
   "true"
 
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" open "http://127.0.0.1:$acceptance_browser_server_port/writing/life-isnt-always-a-river/" >/dev/null
-acceptance_browser_assert_eval \
-  "the first article preserves the original continuous reading experience" \
-  "$acceptance_writing_article_content_expression" \
-  "true"
+acceptance_browser_assert_writing_article_content \
+  "the first article preserves the original continuous reading experience"
 
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" resize 390 844 >/dev/null
 acceptance_browser_assert_eval \

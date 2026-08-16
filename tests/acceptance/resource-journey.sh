@@ -4,6 +4,7 @@ set -euo pipefail
 
 acceptance_directory=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 source "$acceptance_directory/helpers.sh"
+source "$acceptance_directory/contracts/resources.sh"
 acceptance_browser_setup "marcgelpi-resource" "${SITE_RESOURCE_TEST_PORT:-4183}" "marcgelpi-resource-$$"
 trap acceptance_browser_cleanup EXIT
 
@@ -40,13 +41,13 @@ acceptance_browser_assert_resources_context \
 
 acceptance_browser_assert_eval \
   "the approved Resources context retains its heading structure without desktop overflow" \
-  "$acceptance_page_quality_expression" \
+  "$acceptance_page_heading_and_overflow_expression" \
   "true"
 
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" resize 390 844 >/dev/null
 acceptance_browser_assert_eval \
   "the approved Resources context retains its heading structure without mobile overflow" \
-  "$acceptance_page_quality_expression" \
+  "$acceptance_page_heading_and_overflow_expression" \
   "true"
 
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" open "http://127.0.0.1:$acceptance_browser_server_port/resources/how-to-sell-okrs/" >/dev/null
@@ -89,13 +90,13 @@ acceptance_browser_assert_eval \
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" resize 1440 1000 >/dev/null
 acceptance_browser_assert_eval \
   "the Resources shelf fits a desktop viewport" \
-  "$acceptance_page_quality_expression" \
+  "$acceptance_page_heading_and_overflow_expression" \
   "true"
 
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" resize 390 844 >/dev/null
 acceptance_browser_assert_eval \
   "the Resources shelf fits a mobile viewport" \
-  "$acceptance_page_quality_expression" \
+  "$acceptance_page_heading_and_overflow_expression" \
   "true"
 
 echo "PASS: Resources shelf ready for Marc's next resource"

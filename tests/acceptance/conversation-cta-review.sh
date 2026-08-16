@@ -4,6 +4,7 @@ set -euo pipefail
 
 acceptance_directory=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 source "$acceptance_directory/helpers.sh"
+source "$acceptance_directory/contracts/work.sh"
 acceptance_browser_setup "marcgelpi-conversation-cta" "${SITE_CONVERSATION_CTA_TEST_PORT:-4197}" "marcgelpi-conversation-cta-$$"
 trap acceptance_browser_cleanup EXIT
 

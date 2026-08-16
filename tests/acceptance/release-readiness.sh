@@ -4,6 +4,7 @@ set -euo pipefail
 
 acceptance_directory=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 source "$acceptance_directory/helpers.sh"
+source "$acceptance_directory/contracts/release-metadata.sh"
 source "$acceptance_repo_root/scripts/release-policy.sh"
 acceptance_browser_setup "marcgelpi-release" "${SITE_RELEASE_TEST_PORT:-4187}" "marcgelpi-release-$$"
 trap acceptance_browser_cleanup EXIT

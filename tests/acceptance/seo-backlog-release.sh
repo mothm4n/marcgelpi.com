@@ -4,6 +4,10 @@ set -euo pipefail
 
 acceptance_directory=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 source "$acceptance_directory/helpers.sh"
+source "$acceptance_directory/contracts/writing.sh"
+source "$acceptance_directory/contracts/resources.sh"
+source "$acceptance_directory/contracts/release-metadata.sh"
+source "$acceptance_directory/contracts/work.sh"
 source "$acceptance_repo_root/scripts/release-policy.sh"
 acceptance_browser_setup "marcgelpi-seo-backlog" "${SITE_SEO_BACKLOG_TEST_PORT:-4198}" "marcgelpi-seo-backlog-$$"
 trap acceptance_browser_cleanup EXIT
@@ -27,36 +31,29 @@ article_paths_json=$(acceptance_paths_to_json \
   "/work/preparing-to-scale/" \
   "/writing/life-isnt-always-a-river/" \
   "/resources/how-to-sell-okrs/")
+unpublished_paths_json=$(acceptance_paths_to_json \
+  "${release_hidden_paths[@]}" \
+  "/writing/people-first-and-performance/" \
+  "/resources/system-diagnosis/" \
+  "/resources/review-resource/" \
+  "/downloads/review-only.pdf" \
+  "/images/resources/review-only.jpg")
 
 acceptance_browser_start_and_open "$production_site" "/writing/"
 acceptance_browser_assert_release_metadata \
   "the SEO release keeps canonical and social metadata valid across every public page" \
   "$public_paths_json" \
   "$article_paths_json"
+acceptance_browser_assert_eval \
+  "the SEO release excludes taxonomy, retired and review-only routes and assets" \
+  "Promise.all($unpublished_paths_json.map(path => fetch(path))).then(responses => responses.every(response => response.status === 404))" \
+  "true"
 acceptance_browser_assert_writing_orientation "the SEO release preserves the approved Writing orientation and article path"
-
-for viewport in "1440 1000" "390 844"; do
-  viewport_width=${viewport%% *}
-  viewport_height=${viewport##* }
-  "$acceptance_playwright_cli" --session "$acceptance_browser_session" resize "$viewport_width" "$viewport_height" >/dev/null
-  acceptance_browser_assert_eval \
-    "the Writing index keeps valid headings and width at ${viewport_width}px" \
-    "$acceptance_page_quality_expression" \
-    "true"
-done
+acceptance_browser_assert_headings_links_and_overflow_at_viewports "the Writing index"
 
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" open "http://127.0.0.1:$acceptance_browser_server_port/writing/life-isnt-always-a-river/" >/dev/null
 acceptance_browser_assert_writing_article "the SEO release preserves the article while separating search and social copy"
-
-for viewport in "1440 1000" "390 844"; do
-  viewport_width=${viewport%% *}
-  viewport_height=${viewport##* }
-  "$acceptance_playwright_cli" --session "$acceptance_browser_session" resize "$viewport_width" "$viewport_height" >/dev/null
-  acceptance_browser_assert_eval \
-    "the approved article keeps valid headings and width at ${viewport_width}px" \
-    "$acceptance_page_quality_expression" \
-    "true"
-done
+acceptance_browser_assert_headings_links_and_overflow_at_viewports "the approved article"
 
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" open "http://127.0.0.1:$acceptance_browser_server_port/resources/" >/dev/null
 acceptance_browser_assert_resources_context "the SEO release preserves the approved Resources context and experience links"
@@ -65,16 +62,7 @@ acceptance_browser_assert_eval \
   "the Resources index keeps its one approved guide and ordering" \
   "(() => { const links = Array.from(document.querySelectorAll('main ol a')); return links.length === 1 && links[0]?.getAttribute('href') === '/resources/how-to-sell-okrs/' && links[0]?.querySelector('strong')?.textContent.trim() === 'How to sell OKRs internally' && links[0]?.textContent.includes('Field guide · PDF'); })()" \
   "true"
-
-for viewport in "1440 1000" "390 844"; do
-  viewport_width=${viewport%% *}
-  viewport_height=${viewport##* }
-  "$acceptance_playwright_cli" --session "$acceptance_browser_session" resize "$viewport_width" "$viewport_height" >/dev/null
-  acceptance_browser_assert_eval \
-    "the Resources index keeps valid headings and width at ${viewport_width}px" \
-    "$acceptance_page_quality_expression" \
-    "true"
-done
+acceptance_browser_assert_headings_links_and_overflow_at_viewports "the Resources index"
 
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" open "http://127.0.0.1:$acceptance_browser_server_port/resources/how-to-sell-okrs/" >/dev/null
 acceptance_browser_assert_eval \
@@ -93,7 +81,7 @@ for case_path in /work/adevinta/ /work/protected-autonomy/ /work/preparing-to-sc
       "$case_path retains exactly one approved conversation ending at ${viewport_width}px"
     acceptance_browser_assert_eval \
       "$case_path keeps valid headings and width at ${viewport_width}px" \
-      "$acceptance_page_quality_expression" \
+      "$acceptance_page_heading_and_overflow_expression" \
       "true"
   done
 done
