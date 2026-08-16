@@ -15,15 +15,9 @@ cp "$acceptance_repo_root/node_modules/axe-core/axe.min.js" "$release_site/__axe
 
 acceptance_browser_start_and_open "$release_site" "/"
 
-paths_to_json() {
-  local serialized
-  serialized=$(printf '"%s",' "$@")
-  printf '[%s]\n' "${serialized%,}"
-}
-
-public_paths_json=$(paths_to_json "${release_public_paths[@]}")
-hidden_paths_json=$(paths_to_json "${release_hidden_paths[@]}")
-article_paths_json=$(paths_to_json \
+public_paths_json=$(acceptance_paths_to_json "${release_public_paths[@]}")
+hidden_paths_json=$(acceptance_paths_to_json "${release_hidden_paths[@]}")
+article_paths_json=$(acceptance_paths_to_json \
   "/work/adevinta/" \
   "/work/protected-autonomy/" \
   "/work/preparing-to-scale/" \
@@ -32,10 +26,10 @@ article_paths_json=$(paths_to_json \
 forbidden_pattern_json=$(node -e 'process.stdout.write(JSON.stringify(process.argv[1]))' "$release_forbidden_artifact_pattern")
 axe_audit_expression="(async () => { if (!window.axe) { const source = await fetch('/__axe.min.js').then(response => response.text()); (0, eval)(source); } const results = await window.axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22a', 'wcag22aa'] } }); return results.violations.filter(violation => ['serious', 'critical'].includes(violation.impact)).map(violation => violation.id).join('|'); })()"
 
-acceptance_browser_assert_eval \
+acceptance_browser_assert_release_metadata \
   "every public page has unique accurate canonical and social metadata" \
-  "(async () => { const paths = $public_paths_json; const articlePaths = new Set($article_paths_json); const articlePath = '/writing/life-isnt-always-a-river/'; const articleSearchDescription = 'A changed product decision is not automatically a bad one. See how visible reasoning helps teams distinguish learning from chaos.'; const articleSocialDescription = 'Product decisions change. That doesn’t always mean they were wrong.'; const pageOverrides = new Map([['/', { socialTitle: 'Marc Gelpí', socialDescription: 'People-first organizational effectiveness and ways of working.' }], ['/about/', { type: 'profile' }], [articlePath, { searchDescription: articleSearchDescription, socialDescription: articleSocialDescription }]]); const pages = await Promise.all(paths.map(async path => { const response = await fetch(path); const html = await response.text(); const doc = new DOMParser().parseFromString(html, 'text/html'); const meta = key => Array.from(doc.querySelectorAll('meta')).find(node => node.getAttribute('name') === key || node.getAttribute('property') === key)?.content; return { path, ok: response.ok, lang: doc.documentElement.lang, title: doc.title, description: meta('description'), canonical: doc.querySelector('link[rel=\"canonical\"]')?.href, ogTitle: meta('og:title'), ogDescription: meta('og:description'), ogUrl: meta('og:url'), ogType: meta('og:type'), ogLocale: meta('og:locale'), ogImage: meta('og:image'), twitterCard: meta('twitter:card'), twitterDescription: meta('twitter:description') }; })); const uniqueTitles = new Set(pages.map(page => page.title)).size === pages.length; const uniqueDescriptions = new Set(pages.map(page => page.description)).size === pages.length; const accurate = pages.every(page => { const expectations = { type: articlePaths.has(page.path) ? 'article' : 'website', socialTitle: page.title, socialDescription: page.description, searchDescription: page.description, ...pageOverrides.get(page.path) }; return page.ok && page.lang === 'en' && page.title && page.description === expectations.searchDescription && page.canonical === 'https://marcgelpi.com' + page.path && page.ogTitle === expectations.socialTitle && page.ogDescription === expectations.socialDescription && page.twitterDescription === expectations.socialDescription && page.ogUrl === page.canonical && page.ogType === expectations.type && page.ogLocale === 'en_GB' && page.ogImage?.startsWith('https://marcgelpi.com/') && page.twitterCard === 'summary_large_image'; }); return uniqueTitles && uniqueDescriptions && accurate; })()" \
-  "true"
+  "$public_paths_json" \
+  "$article_paths_json"
 
 acceptance_browser_assert_eval \
   "release discovery surfaces use the canonical domain" \

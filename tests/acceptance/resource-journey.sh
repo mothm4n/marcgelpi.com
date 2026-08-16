@@ -35,20 +35,18 @@ acceptance_browser_assert_eval \
   "$resource_shelf_expression" \
   "true"
 
-acceptance_browser_assert_eval \
-  "the approved Resources context explains the guide and links to relevant experience" \
-  "(() => { const main = document.querySelector('main'); const introduction = main?.querySelector('.editorial-index-introduction'); const experienceLinks = Array.from(introduction?.querySelectorAll('a') ?? []); const expectedIntroduction = 'This guide is for leaders, OKR champions and people building internal support for change. It helps you explain why a bounded OKR pilot may be worth testing, prepare for objections and make a smaller ask. A full OKR introduction, company-wide rollout, compensation design and underlying strategy or ownership problems need separate work. For related experience, see the Adevinta case on scaling OKR practice and Marc’s wider experience with organizational change.'; const linksAreKeyboardAccessible = experienceLinks.every(link => { link.focus(); const style = getComputedStyle(link); return document.activeElement === link && style.outlineStyle !== 'none' && parseFloat(style.outlineWidth) > 0; }); return main?.querySelector('h1')?.textContent.trim() === 'Resources' && main?.querySelector('.editorial-index-deck')?.textContent.trim() === 'Practical material for leaders and teams working on organizational effectiveness.' && introduction?.textContent.replace(/\\s+/g, ' ').trim() === expectedIntroduction && experienceLinks.map(link => link.textContent.trim()).join('|') === 'the Adevinta case on scaling OKR practice|Marc’s wider experience with organizational change' && experienceLinks.map(link => link.getAttribute('href')).join('|') === '/work/adevinta/|/about/' && linksAreKeyboardAccessible; })()" \
-  "true"
+acceptance_browser_assert_resources_context \
+  "the approved Resources context explains the guide and links to relevant experience"
 
 acceptance_browser_assert_eval \
   "the approved Resources context retains its heading structure without desktop overflow" \
-  "$acceptance_editorial_index_quality_expression" \
+  "$acceptance_page_quality_expression" \
   "true"
 
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" resize 390 844 >/dev/null
 acceptance_browser_assert_eval \
   "the approved Resources context retains its heading structure without mobile overflow" \
-  "$acceptance_editorial_index_quality_expression" \
+  "$acceptance_page_quality_expression" \
   "true"
 
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" open "http://127.0.0.1:$acceptance_browser_server_port/resources/how-to-sell-okrs/" >/dev/null
@@ -91,13 +89,13 @@ acceptance_browser_assert_eval \
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" resize 1440 1000 >/dev/null
 acceptance_browser_assert_eval \
   "the Resources shelf fits a desktop viewport" \
-  "$acceptance_editorial_index_quality_expression" \
+  "$acceptance_page_quality_expression" \
   "true"
 
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" resize 390 844 >/dev/null
 acceptance_browser_assert_eval \
   "the Resources shelf fits a mobile viewport" \
-  "$acceptance_editorial_index_quality_expression" \
+  "$acceptance_page_quality_expression" \
   "true"
 
 echo "PASS: Resources shelf ready for Marc's next resource"

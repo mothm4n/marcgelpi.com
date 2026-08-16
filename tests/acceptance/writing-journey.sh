@@ -15,8 +15,6 @@ if grep -Fq '<!--more-->' "$writing_archetype"; then
   acceptance_fail "Writing archetype opts into Go deeper without an explicit request"
 fi
 
-article_content_expression="(() => { const main = document.querySelector('main'); const body = main?.querySelector('.writing-body'); const headings = Array.from(body?.querySelectorAll('h2') ?? []).map(heading => heading.firstChild?.textContent.trim()); const source = body?.querySelector('a[href=\"https://www.oliverburkeman.com/meditationsformortals\"]'); return main?.querySelector('h1')?.textContent.trim() === 'Life isn’t always a river' && main?.querySelector('.writing-article-deck')?.textContent.trim() === 'Product decisions change. That doesn’t always mean they were wrong.' && main?.querySelector('time')?.getAttribute('datetime') === '2026-06-01' && body?.textContent.includes('We want meaning. We want coherence. We want the river to actually mean something.') && headings[0] === 'Why it matters' && headings.at(-1) === 'A useful principle' && source?.textContent.trim() === 'Meditations for Mortals' && main?.querySelector('details, aside, progress, [data-comments], [data-tags], [data-categories], [data-filters], nav[aria-label=\"On this page\"]') === null; })()"
-
 production_site="$acceptance_browser_tmp/production-site"
 bash "$acceptance_repo_root/scripts/build-production.sh" "$production_site" >/dev/null
 [[ -f "$production_site/writing/index.html" ]] || acceptance_fail "approved Writing archive is missing from production"
@@ -25,32 +23,23 @@ bash "$acceptance_repo_root/scripts/build-production.sh" "$production_site" >/de
 [[ ! -e "$production_site/writing/people-first-and-performance/index.html" ]] || acceptance_fail "retired Writing leaked into production"
 
 acceptance_browser_start_and_open "$production_site" "/writing/"
-acceptance_browser_assert_eval \
-  "the approved Writing orientation leads into the unchanged chronological archive" \
-  "(() => { const main = document.querySelector('main'); const introduction = main?.querySelector('.editorial-index-introduction'); const orientationLink = introduction?.querySelector('a'); const archiveLinks = Array.from(main?.querySelectorAll('ol a') ?? []); const dates = archiveLinks.map(link => link.querySelector('time')?.getAttribute('datetime')); const expectedIntroduction = 'I write about organizational effectiveness and ways of working; alignment, governance and decision-making; and evidence-based organizational change. Start with why changing a product decision does not prove the original choice was wrong.'; orientationLink?.focus(); const focusStyle = orientationLink && getComputedStyle(orientationLink); return main?.querySelector('h1')?.textContent.trim() === 'Writing' && main?.querySelector('.editorial-index-deck')?.textContent.trim() === 'Notes on organizational effectiveness, decisions, and evidence-based change.' && introduction?.textContent.replace(/\\s+/g, ' ').trim() === expectedIntroduction && orientationLink?.textContent.trim() === 'why changing a product decision does not prove the original choice was wrong' && orientationLink?.getAttribute('href') === '/writing/life-isnt-always-a-river/' && document.activeElement === orientationLink && focusStyle.outlineStyle !== 'none' && parseFloat(focusStyle.outlineWidth) > 0 && archiveLinks.length === 1 && archiveLinks[0]?.getAttribute('href') === '/writing/life-isnt-always-a-river/' && archiveLinks[0]?.querySelector('strong')?.textContent.trim() === 'Life isn’t always a river' && dates.every((date, index) => index === 0 || date <= dates[index - 1]) && main?.querySelector('[data-tags], [data-categories], [data-filters], nav[aria-label="Topics"]') === null && !main?.textContent.includes('Blog'); })()" \
-  "true"
+acceptance_browser_assert_writing_orientation \
+  "the approved Writing orientation leads into the unchanged chronological archive"
 
 acceptance_browser_assert_eval \
   "the approved Writing orientation retains its heading structure without desktop overflow" \
-  "$acceptance_editorial_index_quality_expression" \
+  "$acceptance_page_quality_expression" \
   "true"
 
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" resize 390 844 >/dev/null
 acceptance_browser_assert_eval \
   "the approved Writing orientation retains its heading structure without mobile overflow" \
-  "$acceptance_editorial_index_quality_expression" \
+  "$acceptance_page_quality_expression" \
   "true"
 
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" open "http://127.0.0.1:$acceptance_browser_server_port/writing/life-isnt-always-a-river/" >/dev/null
-acceptance_browser_assert_eval \
-  "the approved article preserves its original continuous reading experience" \
-  "$article_content_expression" \
-  "true"
-
-acceptance_browser_assert_eval \
-  "the approved article separates search metadata from visible and social copy" \
-  "document.title === 'Life isn’t always a river · Marc Gelpí' && document.querySelector('meta[name=\"description\"]')?.content === 'A changed product decision is not automatically a bad one. See how visible reasoning helps teams distinguish learning from chaos.' && document.querySelector('.writing-article-deck')?.textContent.trim() === 'Product decisions change. That doesn’t always mean they were wrong.' && document.querySelector('meta[property=\"og:description\"]')?.content === 'Product decisions change. That doesn’t always mean they were wrong.' && document.querySelector('meta[name=\"twitter:description\"]')?.content === 'Product decisions change. That doesn’t always mean they were wrong.' && document.querySelector('link[rel=canonical]')?.href === 'https://marcgelpi.com/writing/life-isnt-always-a-river/' && document.querySelector('meta[property=\"og:type\"]')?.content === 'article' && document.querySelector('.writing-article-meta')?.textContent.includes('4 min read')" \
-  "true"
+acceptance_browser_assert_writing_article \
+  "the approved article preserves its content and separates search metadata from visible and social copy"
 
 acceptance_browser_assert_eval \
   "Writing RSS describes the approved article on the canonical domain" \
@@ -88,7 +77,7 @@ acceptance_browser_assert_eval \
 
 acceptance_browser_assert_eval \
   "the Writing shelf remains accessible and responsive" \
-  "$acceptance_editorial_index_quality_expression" \
+  "$acceptance_page_quality_expression" \
   "true"
 
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" open "http://127.0.0.1:$acceptance_browser_server_port/writing/older-article/" >/dev/null
@@ -106,7 +95,7 @@ acceptance_browser_assert_eval \
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" open "http://127.0.0.1:$acceptance_browser_server_port/writing/life-isnt-always-a-river/" >/dev/null
 acceptance_browser_assert_eval \
   "the first article preserves the original continuous reading experience" \
-  "$article_content_expression" \
+  "$acceptance_writing_article_content_expression" \
   "true"
 
 "$acceptance_playwright_cli" --session "$acceptance_browser_session" resize 390 844 >/dev/null
