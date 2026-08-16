@@ -1,0 +1,22 @@
+const { defineConfig } = require('playwright/test');
+
+const port = Number(process.env.SITE_TEST_PORT || 4173);
+
+module.exports = defineConfig({
+  testDir: './tests/playwright',
+  fullyParallel: false,
+  workers: 1,
+  reporter: [['line'], ['./tests/playwright/timing-reporter.js']],
+  use: {
+    baseURL: `http://127.0.0.1:${port}`,
+    browserName: 'chromium',
+    headless: true,
+    viewport: { width: 1280, height: 720 },
+  },
+  webServer: {
+    command: 'bash scripts/serve-playwright-site.sh',
+    url: `http://127.0.0.1:${port}/`,
+    reuseExistingServer: false,
+    timeout: 120_000,
+  },
+});

@@ -11,6 +11,8 @@
 /output/
 /prototypes/
 /tmp/
+/test-results/
+/playwright-report/
 /docs/*
 !/docs/adr/
 !/docs/adr/**
