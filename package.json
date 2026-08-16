@@ -2,11 +2,14 @@
   "name": "marcgelpi.com",
   "private": true,
   "scripts": {
-    "test": "npm run test:acceptance",
-    "test:acceptance": "bash tests/acceptance/run.sh"
+    "test": "npm run test:workflow && npm run test:acceptance",
+    "test:workflow": "bash tests/workflow/run.sh",
+    "test:acceptance": "bash tests/acceptance/run.sh",
+    "browser:install-headed": "playwright install chromium",
+    "browser:open-headed": "playwright open"
   },
   "devDependencies": {
-    "@playwright/cli": "0.1.18",
-    "axe-core": "4.13.0"
+    "axe-core": "4.13.0",
+    "playwright": "1.63.0-alpha-2026-08-05"
   }
 }

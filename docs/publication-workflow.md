@@ -44,19 +44,20 @@ Completion: all required approval fields contain real review decisions; no place
 
 ## 4. Verify the production boundary
 
-Run `npm test`. The acceptance suite builds the production site, proves approved content is reachable, and proves representative review-only content is absent from routes, listings, feeds, the sitemap, and homepage references.
+Run `npm test`. The acceptance suite builds one production site, proves approved content is reachable, and proves representative review-only content is absent from routes, listings, feeds, the sitemap, and homepage references.
 
-For a release artifact, also run:
+For a release artifact, build it once, point the complete acceptance suite at that exact directory, and then verify the unchanged directory:
 
 ```sh
 bash scripts/build-production.sh public
+PLAYWRIGHT_PRODUCTION_ARTIFACT="$PWD/public" npm test
 bash scripts/verify-production-release.sh public
 ```
 
-Completion: every command exits successfully and the generated `public/` directory contains only approved public content.
+Completion: every command exits successfully and the tested `public/` directory contains only approved public content. Do not rebuild between acceptance, verification, and upload.
 
 ## 5. Publish
 
-Merge the reviewed change to `master`. GitHub Actions repeats the acceptance suite before deploying to GitHub Pages; a failed build or test blocks deployment.
+Merge the reviewed change to `master`. GitHub Actions builds the canonical production artifact once, runs the acceptance and release gates against it, and submits that same artifact to GitHub Pages. A failed build, test, privacy gate, or release check blocks upload and deployment.
 
 Completion: the deployment succeeds and the intended canonical route resolves over HTTPS.
