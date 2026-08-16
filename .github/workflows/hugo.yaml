@@ -91,15 +91,32 @@ jobs:
           finished_at=$(date +%s)
           bash scripts/publication-timing.sh record "${PUBLICATION_TIMINGS}" "Install browser acceptance dependencies" "${BROWSER_DEPS_STARTED_AT}" "${finished_at}"
           bash scripts/summarize-browser-install.sh "${browser_install_log}" "${BROWSER_DEPS_STARTED_AT}" "${finished_at}" >>"${GITHUB_STEP_SUMMARY}"
+          echo "BUILD_STARTED_AT=${finished_at}" >>"${GITHUB_ENV}"
+
+      - name: Build canonical production artifact
+        env:
+          HUGO_CACHE_DIR: ${{ runner.temp }}/.cache/hugo
+        run: |
+          bash scripts/build-production.sh public
+          finished_at=$(date +%s)
+          bash scripts/publication-timing.sh record "${PUBLICATION_TIMINGS}" "Build" "${BUILD_STARTED_AT}" "${finished_at}"
+          echo "PRODUCTION_ARTIFACT_DIGEST=$(node scripts/release-artifact-digest.js public)" >>"${GITHUB_ENV}"
           echo "ACCEPTANCE_STARTED_AT=${finished_at}" >>"${GITHUB_ENV}"
 
-      - name: Test generated site
+      - name: Test canonical production artifact
         id: acceptance
+        env:
+          PLAYWRIGHT_PRODUCTION_ARTIFACT: ${{ github.workspace }}/public
         run: |
           npm test
+          tested_digest=$(node scripts/release-artifact-digest.js public)
+          [[ "$tested_digest" == "$PRODUCTION_ARTIFACT_DIGEST" ]] || {
+            echo "Production artifact changed after acceptance" >&2
+            exit 1
+          }
           finished_at=$(date +%s)
           bash scripts/publication-timing.sh record "${PUBLICATION_TIMINGS}" "Acceptance" "${ACCEPTANCE_STARTED_AT}" "${finished_at}"
-          echo "BUILD_STARTED_AT=${finished_at}" >>"${GITHUB_ENV}"
+          echo "VERIFY_STARTED_AT=${finished_at}" >>"${GITHUB_ENV}"
 
       - name: Prepare sanitized browser failure evidence
         if: ${{ failure() && steps.acceptance.outcome == 'failure' }}
@@ -117,18 +134,15 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-      - name: Build
-        env:
-          HUGO_CACHE_DIR: ${{ runner.temp }}/.cache/hugo
-        run: |
-          bash scripts/build-production.sh public
-          finished_at=$(date +%s)
-          bash scripts/publication-timing.sh record "${PUBLICATION_TIMINGS}" "Build" "${BUILD_STARTED_AT}" "${finished_at}"
-          echo "VERIFY_STARTED_AT=${finished_at}" >>"${GITHUB_ENV}"
-
       - name: Verify deployable release artifact
         run: |
           bash scripts/verify-production-release.sh public
+          verified_digest=$(node scripts/release-artifact-digest.js public)
+          [[ "$verified_digest" == "$PRODUCTION_ARTIFACT_DIGEST" ]] || {
+            echo "Production artifact changed after release verification" >&2
+            exit 1
+          }
+          printf 'Verified production artifact digest: `%s`\n' "$verified_digest" >>"${GITHUB_STEP_SUMMARY}"
           finished_at=$(date +%s)
           bash scripts/publication-timing.sh record "${PUBLICATION_TIMINGS}" "Verify deployable release artifact" "${VERIFY_STARTED_AT}" "${finished_at}"
           echo "UPLOAD_STARTED_AT=${finished_at}" >>"${GITHUB_ENV}"

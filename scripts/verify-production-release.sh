@@ -32,6 +32,9 @@ for relative_path in "${required_files[@]}"; do
   [[ -f "$site_directory/$relative_path" ]] || fail "missing $relative_path"
 done
 
+hidden_entry=$(find "$site_directory" -mindepth 1 -name '.*' -print -quit)
+[[ -z "$hidden_entry" ]] || fail "hidden entry would be excluded from upload: ${hidden_entry#"$site_directory/"}"
+
 for hidden_path in "${release_hidden_paths[@]}"; do
   hidden_html=$(release_path_to_artifact "$hidden_path")
   hidden_feed="${hidden_html%index.html}index.xml"

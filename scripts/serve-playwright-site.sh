@@ -24,7 +24,21 @@ cleanup() {
 trap cleanup EXIT
 trap 'exit 0' INT TERM
 
-bash "$repo_root/scripts/build-production.sh" "$production_directory" >/dev/null
+if [[ -n "${PLAYWRIGHT_PRODUCTION_ARTIFACT:-}" ]]; then
+  [[ -d "$PLAYWRIGHT_PRODUCTION_ARTIFACT" ]] || {
+    echo "Canonical production artifact does not exist: $PLAYWRIGHT_PRODUCTION_ARTIFACT" >&2
+    exit 2
+  }
+  production_directory=$(cd "$PLAYWRIGHT_PRODUCTION_ARTIFACT" && pwd -P)
+  canonical_production_directory="$repo_root/public"
+  [[ "$production_directory" == "$canonical_production_directory" ]] || {
+    echo "Refusing non-canonical production artifact: $production_directory" >&2
+    exit 2
+  }
+else
+  bash "$repo_root/scripts/build-production.sh" "$production_directory" >/dev/null
+fi
+
 bash "$repo_root/scripts/run-hugo.sh" \
   --source "$repo_root" \
   --destination "$preview_directory" \
