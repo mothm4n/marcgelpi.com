@@ -7,7 +7,7 @@ draft: false
 publication:
   status: "approved"
   reviewed_by: "Marc Gelpí"
-  reviewed_at: "2026-08-11"
+  reviewed_at: "2026-08-16"
   privacy_reviewed: true
 ---
 
