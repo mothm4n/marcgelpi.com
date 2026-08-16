@@ -94,11 +94,28 @@ jobs:
           echo "ACCEPTANCE_STARTED_AT=${finished_at}" >>"${GITHUB_ENV}"
 
       - name: Test generated site
+        id: acceptance
         run: |
           npm test
           finished_at=$(date +%s)
           bash scripts/publication-timing.sh record "${PUBLICATION_TIMINGS}" "Acceptance" "${ACCEPTANCE_STARTED_AT}" "${finished_at}"
           echo "BUILD_STARTED_AT=${finished_at}" >>"${GITHUB_ENV}"
+
+      - name: Prepare sanitized browser failure evidence
+        if: ${{ failure() && steps.acceptance.outcome == 'failure' }}
+        run: |
+          bash scripts/prepare-playwright-failure-evidence.sh \
+            test-results \
+            "${RUNNER_TEMP}/playwright-failure-evidence"
+
+      - name: Preserve browser failure evidence
+        if: ${{ failure() && steps.acceptance.outcome == 'failure' }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: playwright-failure-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/playwright-failure-evidence/
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Build
         env:

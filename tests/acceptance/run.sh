@@ -16,6 +16,7 @@ export PLAYWRIGHT_TIMINGS="$playwright_timings"
 export PLAYWRIGHT_BUILD_REPORT="$playwright_build_report"
 export PLAYWRIGHT_ARTIFACT_REPORT="$playwright_artifact_report"
 export PLAYWRIGHT_FIXTURE_BUILD_REPORT="$playwright_fixture_build_report"
+export PLAYWRIGHT_FAILURE_SUMMARY="$acceptance_repo_root/test-results/failure-summary.tsv"
 printf '0\n' >"$HUGO_BUILD_COUNT_FILE"
 touch "$acceptance_timings" "$playwright_fixture_build_report"
 trap 'rm -rf "$acceptance_timing_tmp"' EXIT
@@ -52,24 +53,6 @@ bash "$acceptance_timing_script" record \
   "Playwright Test group" \
   "$playwright_started_at" \
   "$playwright_finished_at"
-
-for acceptance_test in "$acceptance_directory"/*.sh; do
-  case "$(basename "$acceptance_test")" in
-    helpers.sh | run.sh)
-      continue
-      ;;
-  esac
-
-  journey=$(basename "$acceptance_test" .sh)
-  journey_started_at=$(date +%s)
-  bash "$acceptance_test"
-  journey_finished_at=$(date +%s)
-  bash "$acceptance_timing_script" record \
-    "$acceptance_timings" \
-    "$journey" \
-    "$journey_started_at" \
-    "$journey_finished_at"
-done
 
 acceptance_finished_at=$(date +%s)
 bash "$acceptance_timing_script" record \

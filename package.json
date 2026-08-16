@@ -9,7 +9,6 @@
     "browser:open-headed": "playwright open"
   },
   "devDependencies": {
-    "@playwright/cli": "0.1.18",
     "axe-core": "4.13.0",
     "playwright": "1.63.0-alpha-2026-08-05"
   }

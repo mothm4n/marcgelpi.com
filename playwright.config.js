@@ -20,6 +20,8 @@ module.exports = defineConfig({
     baseURL: `http://127.0.0.1:${port}`,
     browserName: 'chromium',
     headless: true,
+    screenshot: 'only-on-failure',
+    trace: 'retain-on-failure',
     viewport: { width: 1280, height: 720 },
   },
   webServer: {
