@@ -177,7 +177,7 @@ assert_eval \
 "$playwright_cli" --session "$production_session" close >/dev/null
 acceptance_stop_server
 
-hugo \
+bash "$acceptance_repo_root/scripts/run-hugo.sh" \
   --source "$repo_root" \
   --contentDir "$fixture_content" \
   --destination "$preview_site" \

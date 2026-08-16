@@ -63,7 +63,7 @@ if [[ -n "${HUGO_CACHE_DIR:-}" ]]; then
   hugo_args+=(--cacheDir "$HUGO_CACHE_DIR")
 fi
 
-hugo "${hugo_args[@]}"
+bash "$repo_root/scripts/run-hugo.sh" "${hugo_args[@]}"
 
 backup_path=$(mktemp -d "$destination_parent/.site-backup.XXXXXX")
 rmdir "$backup_path"

@@ -22,19 +22,43 @@ defaults:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      publication_started_at: ${{ steps.publication_metadata.outputs.started_at }}
+      publication_timings: ${{ steps.publication_metadata.outputs.timings }}
     env:
       HUGO_VERSION: 0.164.0
       TZ: Europe/Madrid
     steps:
+      - name: Start publication timing
+        run: |
+          started_at=$(date +%s)
+          timings_file="${RUNNER_TEMP}/publication-timings.tsv"
+          : >"${timings_file}"
+          echo "PUBLICATION_STARTED_AT=${started_at}" >>"${GITHUB_ENV}"
+          echo "PUBLICATION_TIMINGS=${timings_file}" >>"${GITHUB_ENV}"
+          echo "CHECKOUT_STARTED_AT=${started_at}" >>"${GITHUB_ENV}"
+
       - name: Checkout
         uses: actions/checkout@v7
         with:
           submodules: recursive
           fetch-depth: 0
 
+      - name: Record Checkout and start Setup Pages
+        run: |
+          finished_at=$(date +%s)
+          bash scripts/publication-timing.sh record "${PUBLICATION_TIMINGS}" "Checkout" "${CHECKOUT_STARTED_AT}" "${finished_at}"
+          echo "SETUP_PAGES_STARTED_AT=${finished_at}" >>"${GITHUB_ENV}"
+
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v6
+
+      - name: Record Setup Pages and start Install Hugo
+        run: |
+          finished_at=$(date +%s)
+          bash scripts/publication-timing.sh record "${PUBLICATION_TIMINGS}" "Setup Pages" "${SETUP_PAGES_STARTED_AT}" "${finished_at}"
+          echo "INSTALL_HUGO_STARTED_AT=${finished_at}" >>"${GITHUB_ENV}"
 
       - name: Install Hugo
         run: |
@@ -42,6 +66,9 @@ jobs:
           mkdir -p "${HOME}/.local/hugo"
           tar -C "${HOME}/.local/hugo" -xf "${{ runner.temp }}/hugo_${HUGO_VERSION}_linux-amd64.tar.gz"
           echo "${HOME}/.local/hugo" >> "${GITHUB_PATH}"
+          finished_at=$(date +%s)
+          bash scripts/publication-timing.sh record "${PUBLICATION_TIMINGS}" "Install Hugo" "${INSTALL_HUGO_STARTED_AT}" "${finished_at}"
+          echo "SETUP_NODE_STARTED_AT=${finished_at}" >>"${GITHUB_ENV}"
 
       - name: Setup Node
         uses: actions/setup-node@v6
@@ -49,28 +76,57 @@ jobs:
           node-version: 22
           cache: npm
 
+      - name: Record Setup Node and start browser dependencies
+        run: |
+          finished_at=$(date +%s)
+          bash scripts/publication-timing.sh record "${PUBLICATION_TIMINGS}" "Setup Node" "${SETUP_NODE_STARTED_AT}" "${finished_at}"
+          echo "BROWSER_DEPS_STARTED_AT=${finished_at}" >>"${GITHUB_ENV}"
+
       - name: Install browser acceptance dependencies
         run: |
           npm ci
           npx playwright install --with-deps chromium
+          finished_at=$(date +%s)
+          bash scripts/publication-timing.sh record "${PUBLICATION_TIMINGS}" "Install browser acceptance dependencies" "${BROWSER_DEPS_STARTED_AT}" "${finished_at}"
+          echo "ACCEPTANCE_STARTED_AT=${finished_at}" >>"${GITHUB_ENV}"
 
       - name: Test generated site
-        run: npm test
+        run: |
+          npm test
+          finished_at=$(date +%s)
+          bash scripts/publication-timing.sh record "${PUBLICATION_TIMINGS}" "Acceptance" "${ACCEPTANCE_STARTED_AT}" "${finished_at}"
+          echo "BUILD_STARTED_AT=${finished_at}" >>"${GITHUB_ENV}"
 
       - name: Build
         env:
           HUGO_CACHE_DIR: ${{ runner.temp }}/.cache/hugo
         run: |
           bash scripts/build-production.sh public
+          finished_at=$(date +%s)
+          bash scripts/publication-timing.sh record "${PUBLICATION_TIMINGS}" "Build" "${BUILD_STARTED_AT}" "${finished_at}"
+          echo "VERIFY_STARTED_AT=${finished_at}" >>"${GITHUB_ENV}"
 
       - name: Verify deployable release artifact
-        run: bash scripts/verify-production-release.sh public
+        run: |
+          bash scripts/verify-production-release.sh public
+          finished_at=$(date +%s)
+          bash scripts/publication-timing.sh record "${PUBLICATION_TIMINGS}" "Verify deployable release artifact" "${VERIFY_STARTED_AT}" "${finished_at}"
+          echo "UPLOAD_STARTED_AT=${finished_at}" >>"${GITHUB_ENV}"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:
           include-hidden-files: false
           path: ./public
+
+      - name: Publish build timing summary
+        id: publication_metadata
+        run: |
+          finished_at=$(date +%s)
+          bash scripts/publication-timing.sh record "${PUBLICATION_TIMINGS}" "Upload artifact" "${UPLOAD_STARTED_AT}" "${finished_at}"
+          bash scripts/publication-timing.sh render "Publication timing through upload" "${PUBLICATION_TIMINGS}" >>"${GITHUB_STEP_SUMMARY}"
+          echo "started_at=${PUBLICATION_STARTED_AT}" >>"${GITHUB_OUTPUT}"
+          echo "timings=$(base64 -w 0 "${PUBLICATION_TIMINGS}")" >>"${GITHUB_OUTPUT}"
 
   deploy:
     runs-on: ubuntu-latest
@@ -79,6 +135,34 @@ jobs:
       name: github-pages
       url: "${{ steps.deployment.outputs.page_url }}"
     steps:
+      - name: Start deploy timing
+        run: echo "DEPLOY_STARTED_AT=$(date +%s)" >>"${GITHUB_ENV}"
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+
+      - name: Publish total publication timing summary
+        env:
+          PUBLICATION_STARTED_AT: ${{ needs.build.outputs.publication_started_at }}
+          PUBLICATION_TIMINGS_BASE64: ${{ needs.build.outputs.publication_timings }}
+        run: |
+          finished_at=$(date +%s)
+          timings_file="${RUNNER_TEMP}/publication-timings.tsv"
+          printf '%s' "${PUBLICATION_TIMINGS_BASE64}" | base64 --decode >"${timings_file}"
+          printf 'Deploy to GitHub Pages\t%s\n' "$((finished_at - DEPLOY_STARTED_AT))" >>"${timings_file}"
+          printf 'Total publication\t%s\n' "$((finished_at - PUBLICATION_STARTED_AT))" >>"${timings_file}"
+          {
+            printf '## Publication timing\n\n'
+            printf '| Phase | Duration |\n'
+            printf '| --- | ---: |\n'
+            while IFS=$'\t' read -r phase seconds; do
+              minutes=$((seconds / 60))
+              remainder=$((seconds % 60))
+              if ((minutes > 0)); then
+                printf '| %s | %dm %02ds |\n' "${phase}" "${minutes}" "${remainder}"
+              else
+                printf '| %s | %ds |\n' "${phase}" "${remainder}"
+              fi
+            done <"${timings_file}"
+          } >>"${GITHUB_STEP_SUMMARY}"

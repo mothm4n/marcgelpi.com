@@ -7,7 +7,7 @@ source "$acceptance_directory/helpers.sh"
 acceptance_browser_setup "marcgelpi-shell" "${SITE_TEST_PORT:-4173}" "marcgelpi-shell-$$"
 trap acceptance_browser_cleanup EXIT
 
-hugo \
+bash "$acceptance_repo_root/scripts/run-hugo.sh" \
   --source "$acceptance_repo_root" \
   --destination "$acceptance_browser_site_dir" \
   --gc \

@@ -194,7 +194,7 @@ acceptance_browser_build_preview() {
     hugo_args+=(--contentDir "$content_directory")
   fi
 
-  hugo "${hugo_args[@]}"
+  bash "$acceptance_repo_root/scripts/run-hugo.sh" "${hugo_args[@]}"
 }
 
 acceptance_browser_start_and_open() {
