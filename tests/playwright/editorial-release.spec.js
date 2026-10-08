@@ -6,6 +6,7 @@ const {
   expectEvaluation,
   expectEvaluationAfterLayout,
   expectHeadingLinksAndOverflow,
+  expectLatestWriting,
   expectReleaseMetadata,
   expectWritingArticle,
   expectWritingArticleContent,
@@ -217,6 +218,75 @@ test('Publication workflow journey', async ({
   await expect(page.locator('[data-publication-review-banner]')).toHaveCount(0);
 });
 
+test('Scheduled publication journey', async ({
+  page,
+  createContentFixture,
+  createIsolatedArtifact,
+  expectProductionRejection,
+}) => {
+  test.setTimeout(120_000);
+  const fixture = await createContentFixture();
+  await fixture.copyFixture('writing/scheduled-article.md', 'writing/scheduled-article.md');
+  const scheduled = await fs.readFile(path.join(fixture.directory, 'writing/scheduled-article.md'), 'utf8');
+  const reviewFile = path.join(fixture.directory, 'writing/scheduled-review.md');
+  await fs.writeFile(reviewFile, scheduled
+    .replace('Scheduled writing fixture', 'Scheduled review fixture')
+    .replace('draft: false', 'draft: true')
+    .replace('status: "approved"', 'status: "review"')
+    .replace('SCHEDULED_WRITING_SENTINEL', 'SCHEDULED_REVIEW_SENTINEL'));
+
+  // In June, 09:00 in Europe/Madrid is 07:00 UTC.
+  const before = await createIsolatedArtifact({
+    contentDirectory: fixture.directory,
+    clock: '2030-06-01T06:59:59Z',
+  });
+  for (const route of ['/writing/scheduled-article/', '/writing/scheduled-review/']) {
+    expect((await page.request.get(`${before.url}${route}`)).status()).toBe(404);
+  }
+  for (const marker of ['scheduled-article', 'scheduled-review', 'SCHEDULED_WRITING_SENTINEL', 'SCHEDULED_REVIEW_SENTINEL']) {
+    expect(await directoryContains(before.directory, marker)).toBe(false);
+  }
+  await page.goto(`${before.url}/writing/`);
+  await expectEvaluation(page, writingOrientationExpression);
+  await expectLatestWriting(page);
+
+  const after = await createIsolatedArtifact({
+    contentDirectory: fixture.directory,
+    clock: '2030-06-01T07:00:00Z',
+  });
+  await page.goto(`${after.url}/writing/scheduled-article/`);
+  await expect(page.locator('main h1')).toHaveText('Scheduled writing fixture');
+  await expect(page.locator('main time')).toHaveAttribute('datetime', '2030-06-01');
+  await page.goto(`${after.url}/writing/`);
+  await expectEvaluation(page, writingOrientationExpression);
+  await expect(page.locator('.writing-archive a').first()).toHaveAttribute('href', '/writing/scheduled-article/');
+  await expectLatestWriting(page);
+  await page.goto(`${after.url}/`);
+  await expect(page.locator('[data-home-section="latest-writing"] a')).toHaveAttribute('href', '/writing/scheduled-article/');
+  for (const route of ['/writing/index.xml', '/index.xml', '/sitemap.xml']) {
+    const response = await page.request.get(`${after.url}${route}`);
+    expect(response.ok()).toBe(true);
+    expect(await response.text()).toContain('https://marcgelpi.com/writing/scheduled-article/');
+  }
+  expect((await page.request.get(`${after.url}/writing/scheduled-review/`)).status()).toBe(404);
+  expect(await directoryContains(after.directory, 'scheduled-review')).toBe(false);
+  expect(await directoryContains(after.directory, 'SCHEDULED_REVIEW_SENTINEL')).toBe(false);
+  const verification = childProcess.spawnSync(
+    'bash',
+    [path.join(repoRoot, 'scripts/verify-production-release.sh'), after.directory],
+    { encoding: 'utf8' },
+  );
+  expect(verification.status, `${verification.stdout}\n${verification.stderr}`).toBe(0);
+
+  // Reaching the date cannot bypass approval even if draft is cleared.
+  await fs.writeFile(reviewFile, (await fs.readFile(reviewFile, 'utf8')).replace('draft: true', 'draft: false'));
+  await expectProductionRejection({
+    contentDirectory: fixture.directory,
+    clock: '2030-06-01T07:00:00Z',
+    expectedError: 'cannot be published',
+  });
+});
+
 test('Release readiness journey', async ({ page, canonicalArtifacts }) => {
   test.setTimeout(120_000);
   const verification = childProcess.spawnSync(
@@ -412,8 +482,9 @@ test('Writing journey', async ({ page, canonicalArtifacts, createContentFixture,
     environment: 'development',
   });
   await page.goto(`${preview.url}/writing/`);
-  await expectEvaluation(page, String.raw`(async () => { const main = document.querySelector('main'); const titles = Array.from(main?.querySelectorAll('ol a strong') ?? []).map(title => title.textContent.trim()); const response = await fetch('/writing/people-first-and-performance/'); return main?.querySelector('h1')?.textContent.trim() === 'Writing' && titles[0] === 'AI changes the rhythm of work' && titles.includes('Older writing fixture') && titles.includes('Life isn’t always a river') && titles.includes('Long-form writing fixture') && !main?.textContent.includes('People-first is not the opposite of performance') && response.status === 404; })()`);
-  await expectEvaluation(page, String.raw`fetch('/').then(response => response.text()).then(html => html.includes('data-home-section="latest-writing"') && html.includes('/writing/when-work-is-ready/') && !html.includes('/writing/people-first-and-performance/') && !html.includes('/writing/older-article/'))`);
+  await expectLatestWriting(page, `http://127.0.0.1:${Number(process.env.SITE_TEST_PORT || 4173)}`);
+  await expectEvaluation(page, String.raw`(async () => { const main = document.querySelector('main'); const titles = Array.from(main?.querySelectorAll('ol a strong') ?? []).map(title => title.textContent.trim()); const response = await fetch('/writing/people-first-and-performance/'); return main?.querySelector('h1')?.textContent.trim() === 'Writing' && titles.includes('AI changes the rhythm of work') && titles.includes('Older writing fixture') && titles.includes('Life isn’t always a river') && titles.includes('Long-form writing fixture') && !main?.textContent.includes('People-first is not the opposite of performance') && response.status === 404; })()`);
+  await expectEvaluation(page, String.raw`fetch('/').then(response => response.text()).then(html => html.includes('data-home-section="latest-writing"') && !html.includes('/writing/people-first-and-performance/') && !html.includes('/writing/older-article/'))`);
   await expectEvaluation(page, headingAndOverflowExpression);
   await page.goto(`${preview.url}/writing/older-article/`);
   await expectEvaluation(page, String.raw`(() => { const main = document.querySelector('main'); return main?.querySelector('h1')?.textContent.trim() === 'Older writing fixture' && main?.querySelector('article nav[aria-label="On this page"], article aside, progress, [data-comments], [data-tags], [data-categories], [data-filters]') === null; })()`);

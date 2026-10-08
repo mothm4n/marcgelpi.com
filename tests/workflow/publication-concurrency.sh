@@ -18,6 +18,8 @@ contains() {
 contains 'branches:'
 contains '      - master'
 contains 'workflow_dispatch:'
+contains 'schedule:'
+contains "cron: '17 * * * *'"
 contains 'group: pages'
 contains 'cancel-in-progress: true'
 contains 'The desired published state is the latest commit on the publication branch.'

@@ -5,6 +5,10 @@ on:
     branches:
       - master
   workflow_dispatch:
+  schedule:
+    # Rebuild hourly so approved articles appear after their publication date.
+    # Avoid the start of the hour, when scheduled Actions are busiest.
+    - cron: '17 * * * *'
 
 permissions:
   contents: read

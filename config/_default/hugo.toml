@@ -2,6 +2,7 @@ theme = "blowfish"
 baseURL = "https://marcgelpi.com/"
 defaultContentLanguage = "en"
 defaultContentLanguageInSubdir = false
+timeZone = "Europe/Madrid"
 
 enableRobotsTXT = true
 enableEmoji = true

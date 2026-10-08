@@ -95,14 +95,18 @@ const test = base.extend({
 
   createIsolatedArtifact: async ({}, use, testInfo) => {
     const artifacts = [];
-    await use(async ({ contentDirectory, environment = 'production' } = {}) => {
+    await use(async ({ contentDirectory, environment = 'production', clock } = {}) => {
       const root = await fs.mkdtemp(path.join(os.tmpdir(), 'playwright-isolated-site.'));
       const directory = path.join(root, 'site');
       let args;
       let env = process.env;
       if (environment === 'production') {
         args = [path.join(repoRoot, 'scripts/build-production.sh'), directory];
-        env = { ...process.env, ...(contentDirectory ? { SITE_CONTENT_DIR: contentDirectory } : {}) };
+        env = {
+          ...process.env,
+          ...(contentDirectory ? { SITE_CONTENT_DIR: contentDirectory } : {}),
+          ...(clock ? { SITE_BUILD_CLOCK: clock } : {}),
+        };
       } else {
         args = [
           path.join(repoRoot, 'scripts/run-hugo.sh'),
@@ -118,6 +122,9 @@ const test = base.extend({
         if (contentDirectory) {
           args.push('--contentDir', contentDirectory);
         }
+      }
+      if (clock && environment !== 'production') {
+        args.push('--clock', clock);
       }
       await recordFixtureBuild(testInfo);
       const result = run('bash', args, env);
@@ -137,7 +144,7 @@ const test = base.extend({
 
   expectProductionRejection: async ({}, use, testInfo) => {
     const roots = [];
-    await use(async ({ contentDirectory, expectedError, seedFiles = {} }) => {
+    await use(async ({ contentDirectory, expectedError, seedFiles = {}, clock }) => {
       const root = await fs.mkdtemp(path.join(os.tmpdir(), 'playwright-rejected-site.'));
       const directory = path.join(root, 'site');
       await fs.mkdir(directory, { recursive: true });
@@ -151,7 +158,11 @@ const test = base.extend({
       const result = run(
         'bash',
         [path.join(repoRoot, 'scripts/build-production.sh'), directory],
-        { ...process.env, SITE_CONTENT_DIR: contentDirectory },
+        {
+          ...process.env,
+          SITE_CONTENT_DIR: contentDirectory,
+          ...(clock ? { SITE_BUILD_CLOCK: clock } : {}),
+        },
       );
       const output = `${result.stdout}\n${result.stderr}`;
       expect(result.status, output).not.toBe(0);

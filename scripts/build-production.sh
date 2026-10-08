@@ -63,6 +63,11 @@ if [[ -n "${HUGO_CACHE_DIR:-}" ]]; then
   hugo_args+=(--cacheDir "$HUGO_CACHE_DIR")
 fi
 
+# Fixed clocks let acceptance fixtures exercise the publication boundary.
+if [[ -n "${SITE_BUILD_CLOCK:-}" ]]; then
+  hugo_args+=(--clock "$SITE_BUILD_CLOCK")
+fi
+
 bash "$repo_root/scripts/run-hugo.sh" "${hugo_args[@]}"
 
 backup_path=$(mktemp -d "$destination_parent/.site-backup.XXXXXX")

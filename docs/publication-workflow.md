@@ -61,3 +61,23 @@ Completion: every command exits successfully and the tested `public/` directory 
 Merge the reviewed change to `master`. GitHub Actions builds the canonical production artifact once, runs the acceptance and release gates against it, and submits that same artifact to GitHub Pages. A failed build, test, privacy gate, or release check blocks upload and deployment.
 
 Completion: the deployment succeeds and the intended canonical route resolves over HTTPS.
+
+## 6. Schedule an approved article
+
+Complete the preview and approval steps before scheduling. Keep `draft: false` and the real approval record, then set `date` and `publishDate` to the intended publication time. For example:
+
+```yaml
+date: 2026-11-10T09:00:00+01:00
+publishDate: 2026-11-10T09:00:00+01:00
+draft: false
+```
+
+The date shown on the article comes from `date`; `publishDate` controls when it becomes eligible for a production build. Setting both to the same time keeps the archive and homepage ordered by publication time. If `publishDate` is omitted, Hugo uses `date`. The site uses `Europe/Madrid` for dates without an explicit offset. Use `+01:00` in winter and `+02:00` in summer when specifying an offset.
+
+Merge the approved article into `master` ahead of that time. Hugo excludes future articles from production pages, listings, feeds, and the sitemap. To review a future draft locally, run `hugo server --buildDrafts --buildFuture`; do not enable future content in production.
+
+The existing GitHub Actions workflow rebuilds and deploys at minute 17 of every hour, with the same acceptance, approval, and release gates as a normal publication. An eligible article appears after the next successful deployment. No new commit is needed on its publication day. Push and manual publication triggers remain available.
+
+This is an hourly schedule, not an exact-time guarantee: GitHub may delay or drop a scheduled run, and the deployment also takes time. GitHub also disables schedules in public repositories after 60 days without repository activity; re-enable the workflow in Actions if necessary. See [GitHub's schedule documentation](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule) and [Hugo's future-content rules](https://gohugo.io/getting-started/usage/#draft-future-and-expired-content).
+
+Completion: the article is absent before its publication time and appears in the next successful production deployment after that time, with its approval record intact.

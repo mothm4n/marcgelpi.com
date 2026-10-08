@@ -1,6 +1,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { test, expect } = require('./fixtures');
+const { expectLatestWriting } = require('./assertions');
 
 const previewPort = Number(process.env.SITE_PREVIEW_TEST_PORT || 4174);
 const previewBaseURL = `http://127.0.0.1:${previewPort}`;
@@ -48,16 +49,18 @@ test('Home journey', async ({ page }) => {
     "Array.from(document.querySelectorAll('main > [data-home-section]')).map(section => section.dataset.homeSection).join('|')",
     sectionOrder,
   );
+  await expectLatestWriting(page);
 
   await page.goto(`${previewBaseURL}/`);
+  await expectLatestWriting(page, `http://127.0.0.1:${Number(process.env.SITE_TEST_PORT || 4173)}`);
   await expectEvaluation(page, String.raw`(() => { const hero = document.querySelector('[data-home-section="hero"]'); const actions = Array.from(hero?.querySelectorAll('a') ?? []); return hero?.querySelector('h1')?.textContent.replace(/\s+/g, ' ').trim() === 'People-First Organizational Effectiveness & Ways of Working Leader' && hero?.textContent.includes('Helping organizations scale without losing the people who make them work') && actions.map(link => link.textContent.replace(/\s+/g, ' ').trim()).join('|') === 'Explore my work ↘|Start a conversation →' && actions.map(link => link.getAttribute('href')).join('|') === '/work/|/contact/'; })()`);
   await expectEvaluation(
     page,
     "Array.from(document.querySelectorAll('main > [data-home-section]')).map(section => section.dataset.homeSection).join('|')",
     sectionOrder,
   );
-  await expectEvaluation(page, String.raw`(() => { const hrefs = new Set(Array.from(document.querySelectorAll('main a')).map(link => link.getAttribute('href'))); return ['/work/adevinta/', '/about/', '/writing/when-work-is-ready/', '/resources/how-to-sell-okrs/', '/contact/'].every(path => hrefs.has(path)) && !hrefs.has('/writing/people-first-and-performance/') && !hrefs.has('/resources/system-diagnosis/'); })()`);
-  await expectEvaluation(page, String.raw`(() => { const writing = document.querySelector('[data-home-section="latest-writing"]'); const resource = document.querySelector('[data-home-section="selected-resources"]'); return writing?.querySelector('a')?.getAttribute('href') === '/writing/when-work-is-ready/' && writing?.querySelector('h2')?.textContent.trim() === 'Latest writing' && writing?.querySelector('h3')?.textContent.trim() === 'AI changes the rhythm of work' && writing?.textContent.includes('AI can speed up work. Teams need to rethink how they decide and learn.') && resource?.querySelector('a')?.getAttribute('href') === '/resources/how-to-sell-okrs/' && resource?.querySelector('h2')?.textContent.trim() === 'Selected resources' && resource?.querySelector('h3')?.textContent.trim() === 'How to sell OKRs internally' && resource?.textContent.includes('A practical case for focus, alignment, accountability and ambitious learning'); })()`);
+  await expectEvaluation(page, String.raw`(() => { const hrefs = new Set(Array.from(document.querySelectorAll('main a')).map(link => link.getAttribute('href'))); return ['/work/adevinta/', '/about/', '/resources/how-to-sell-okrs/', '/contact/'].every(path => hrefs.has(path)) && !hrefs.has('/writing/people-first-and-performance/') && !hrefs.has('/resources/system-diagnosis/'); })()`);
+  await expectEvaluation(page, String.raw`(() => { const resource = document.querySelector('[data-home-section="selected-resources"]'); return resource?.querySelector('a')?.getAttribute('href') === '/resources/how-to-sell-okrs/' && resource?.querySelector('h2')?.textContent.trim() === 'Selected resources' && resource?.querySelector('h3')?.textContent.trim() === 'How to sell OKRs internally' && resource?.textContent.includes('A practical case for focus, alignment, accountability and ambitious learning'); })()`);
   await expectEvaluation(page, String.raw`(() => { const work = document.querySelector('[data-home-section="selected-work"]'); const logo = work?.querySelector('img[alt="Adevinta"]'); const copy = work?.textContent.replace(/\s+/g, ' ').trim() ?? ''; return logo !== null && copy.includes('Leading global bank') && copy.includes('Fintech') && !/anonymous|anonymized|confidential/i.test(copy); })()`);
   await expectEvaluation(page, String.raw`(() => { const copy = document.querySelector('[data-home-section="how-i-work"]')?.textContent.replace(/\s+/g, ' ').toLowerCase() ?? ''; return ['grounded theory', 'interviews', 'qualitative', 'recurring patterns', 'first impressions', 'fieldwork', 'hands dirty', 'generalist'].every(term => copy.includes(term)); })()`);
   await expectEvaluation(page, String.raw`(async () => { const links = Array.from(document.querySelectorAll('main a, [data-primary-navigation] a')); return links.every(link => Boolean(link.getAttribute('href'))) && (await Promise.all(links.map(link => fetch(link.pathname).then(response => response.ok)))).every(Boolean); })()`);
