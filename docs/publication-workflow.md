@@ -2,6 +2,8 @@
 
 Use this workflow for every editorial page, case, article, or resource. A production build is the publication gate: reviewable content may appear in a local preview, while only explicitly approved content may enter the deployed artifact.
 
+For changes to publication automation or scheduling, preserve the [approval requirements](#3-record-approval) and [production verification procedure](#4-verify-the-production-boundary). For performance changes, consult the [publication performance budget, measurements, and decisions](../.github/publication-performance.md).
+
 ## 1. Prepare reviewable content
 
 Create the content with `draft: true` and this publication record:
