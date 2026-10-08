@@ -10,6 +10,7 @@ release_public_paths=(
   /about/
   /writing/
   /writing/life-isnt-always-a-river/
+  /writing/when-work-is-ready/
   /resources/
   /resources/how-to-sell-okrs/
   /contact/

@@ -27,6 +27,7 @@ const publicPaths = [
   '/about/',
   '/writing/',
   '/writing/life-isnt-always-a-river/',
+  '/writing/when-work-is-ready/',
   '/resources/',
   '/resources/how-to-sell-okrs/',
   '/contact/',
@@ -38,6 +39,7 @@ const articlePaths = [
   '/work/protected-autonomy/',
   '/work/preparing-to-scale/',
   '/writing/life-isnt-always-a-river/',
+  '/writing/when-work-is-ready/',
   '/resources/how-to-sell-okrs/',
 ];
 const forbiddenArtifactPattern = 'data-publication-review-banner|analytics|gtag|googletagmanager|posthog|hubspot|calendly|disqus|<form([ >])|<iframe([ >])|data-site-search|data-language-selector|cookie consent|newsletter|comments';
@@ -312,6 +314,7 @@ test('SEO backlog release journey', async ({ page, canonicalArtifacts }) => {
   for (const relativePath of [
     'writing/index.html',
     'writing/life-isnt-always-a-river/index.html',
+    'writing/when-work-is-ready/index.html',
     'resources/index.html',
     'resources/how-to-sell-okrs/index.html',
     'downloads/how-to-sell-okrs.pdf',
@@ -367,6 +370,7 @@ test('Writing journey', async ({ page, canonicalArtifacts, createContentFixture,
   for (const relativePath of [
     'writing/index.html',
     'writing/life-isnt-always-a-river/index.html',
+    'writing/when-work-is-ready/index.html',
     'writing/index.xml',
   ]) {
     expect(await exists(path.join(canonicalArtifacts.productionDirectory, relativePath))).toBe(true);
@@ -381,6 +385,15 @@ test('Writing journey', async ({ page, canonicalArtifacts, createContentFixture,
   await page.goto('/writing/life-isnt-always-a-river/');
   await expectWritingArticle(page);
   await expectEvaluation(page, String.raw`fetch('/writing/index.xml').then(response => response.text()).then(feed => feed.includes('<rss') && feed.includes('<title>Life isn’t always a river</title>') && feed.includes('https://marcgelpi.com/writing/life-isnt-always-a-river/'))`);
+
+  await page.goto('/writing/when-work-is-ready/');
+  await expect(page.locator('main h1')).toHaveText('AI changes the rhythm of work');
+  await expect(page.locator('main time')).toHaveAttribute('datetime', '2026-10-08');
+  await expect(page.locator('.writing-body')).toContainText('event-driven ways of working');
+  await expect(page.locator('.writing-body a[href^="https://"]')).toHaveCount(5);
+  await expect(page.locator('main details, main nav[aria-label="On this page"], [data-publication-review-banner]')).toHaveCount(0);
+  await expectHeadingLinksAndOverflow(page);
+  await expectEvaluation(page, String.raw`fetch('/writing/index.xml').then(response => response.text()).then(feed => feed.includes('<title>AI changes the rhythm of work</title>') && feed.includes('https://marcgelpi.com/writing/when-work-is-ready/'))`);
 
   const fixture = await createContentFixture();
   await fixture.copyFixture('writing/older-article.md', 'writing/older-article.md');
@@ -399,8 +412,8 @@ test('Writing journey', async ({ page, canonicalArtifacts, createContentFixture,
     environment: 'development',
   });
   await page.goto(`${preview.url}/writing/`);
-  await expectEvaluation(page, String.raw`(async () => { const main = document.querySelector('main'); const titles = Array.from(main?.querySelectorAll('ol a strong') ?? []).map(title => title.textContent.trim()); const response = await fetch('/writing/people-first-and-performance/'); return main?.querySelector('h1')?.textContent.trim() === 'Writing' && titles[0] === 'Older writing fixture' && titles.includes('Life isn’t always a river') && titles.includes('Long-form writing fixture') && !main?.textContent.includes('People-first is not the opposite of performance') && response.status === 404; })()`);
-  await expectEvaluation(page, String.raw`fetch('/').then(response => response.text()).then(html => html.includes('data-home-section="latest-writing"') && html.includes('/writing/life-isnt-always-a-river/') && !html.includes('/writing/people-first-and-performance/') && !html.includes('/writing/older-article/'))`);
+  await expectEvaluation(page, String.raw`(async () => { const main = document.querySelector('main'); const titles = Array.from(main?.querySelectorAll('ol a strong') ?? []).map(title => title.textContent.trim()); const response = await fetch('/writing/people-first-and-performance/'); return main?.querySelector('h1')?.textContent.trim() === 'Writing' && titles[0] === 'AI changes the rhythm of work' && titles.includes('Older writing fixture') && titles.includes('Life isn’t always a river') && titles.includes('Long-form writing fixture') && !main?.textContent.includes('People-first is not the opposite of performance') && response.status === 404; })()`);
+  await expectEvaluation(page, String.raw`fetch('/').then(response => response.text()).then(html => html.includes('data-home-section="latest-writing"') && html.includes('/writing/when-work-is-ready/') && !html.includes('/writing/people-first-and-performance/') && !html.includes('/writing/older-article/'))`);
   await expectEvaluation(page, headingAndOverflowExpression);
   await page.goto(`${preview.url}/writing/older-article/`);
   await expectEvaluation(page, String.raw`(() => { const main = document.querySelector('main'); return main?.querySelector('h1')?.textContent.trim() === 'Older writing fixture' && main?.querySelector('article nav[aria-label="On this page"], article aside, progress, [data-comments], [data-tags], [data-categories], [data-filters]') === null; })()`);
