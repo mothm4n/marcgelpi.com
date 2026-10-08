@@ -78,7 +78,7 @@ When changing delivery commands, run `npm run test:release-preparation` as well 
 
 ## 5. Publish
 
-Merge the reviewed change to `master`. GitHub Actions builds the canonical production artifact once, runs the acceptance and release gates against it, and submits that same artifact to GitHub Pages. A failed build, test, privacy gate, or release check blocks upload and deployment.
+Merge the reviewed change to `master`, or submit an unchanged, reviewed release candidate with the [publication command](agents/release-publication.md). The command requires explicit approval of the prepared candidate ID and stops if the publication branch has advanced. GitHub Actions builds the canonical production artifact once, runs the acceptance and release gates against it, and submits that same artifact to GitHub Pages. A failed build, test, privacy gate, or release check blocks upload and deployment.
 
 Completion: the deployment succeeds and the intended canonical route resolves over HTTPS.
 
