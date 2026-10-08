@@ -2,6 +2,8 @@
 
 Use this workflow for every editorial page, case, article, or resource. A production build is the publication gate: reviewable content may appear in a local preview, while only explicitly approved content may enter the deployed artifact.
 
+For changes to publication automation or scheduling, preserve the [approval requirements](#3-record-approval) and [production verification procedure](#4-verify-the-production-boundary). For performance changes, consult the [publication performance budget, measurements, and decisions](../.github/publication-performance.md).
+
 ## 1. Prepare reviewable content
 
 Create the content with `draft: true` and this publication record:
@@ -44,7 +46,7 @@ Completion: all required approval fields contain real review decisions; no place
 
 ## 4. Verify the production boundary
 
-Run `npm test`. The acceptance suite builds one production site, proves approved content is reachable, and proves representative review-only content is absent from routes, listings, feeds, the sitemap, and homepage references.
+Run `npm test`. The acceptance suite builds one production site, proves approved content is reachable, and proves representative review-only content is absent from routes, listings, feeds, the sitemap, and homepage references. For concise local results with a retained complete log, use the [agent test command](agents/test-running.md).
 
 For a release artifact, build it once, point the complete acceptance suite at that exact directory, and then verify the unchanged directory:
 

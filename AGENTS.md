@@ -14,7 +14,7 @@ This repository uses the single-context layout. See `docs/agents/domain.md`.
 
 ### Publication workflow
 
-When preparing, approving, or publishing editorial content, follow `docs/publication-workflow.md`.
+When preparing, approving, or publishing editorial content, or changing publication automation or scheduling, follow [docs/publication-workflow.md](docs/publication-workflow.md).
 
 ### Editorial voice
 
