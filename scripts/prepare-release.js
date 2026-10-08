@@ -162,6 +162,11 @@ try {
   saveReceipt();
 
   const checkEnv = { ...releaseEnv, PLAYWRIGHT_PRODUCTION_ARTIFACT: receipt.artifact.directory, ACCEPTANCE_REPORT_DIRECTORY: receipt.reports.acceptance };
+  // Native Hugo overrides can redirect content, configuration, or resources
+  // outside the selected tree. The cache is set explicitly below.
+  for (const name of Object.keys(checkEnv)) {
+    if (name.startsWith('HUGO_')) delete checkEnv[name];
+  }
   // Content and fixed-clock overrides are for fixtures, never release candidates.
   delete checkEnv.SITE_CONTENT_DIR;
   delete checkEnv.SITE_BUILD_CLOCK;
