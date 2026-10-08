@@ -6,7 +6,9 @@
     "test:workflow": "bash tests/workflow/run.sh",
     "test:acceptance": "bash tests/acceptance/run.sh",
     "browser:install-headed": "playwright install chromium",
-    "browser:open-headed": "playwright open"
+    "browser:open-headed": "playwright open",
+    "release:prepare": "node scripts/prepare-release.js",
+    "test:release-preparation": "node --test tests/release/prepare-release.test.js"
   },
   "devDependencies": {
     "axe-core": "4.13.0",

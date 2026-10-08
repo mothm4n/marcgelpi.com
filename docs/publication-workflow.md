@@ -56,6 +56,24 @@ bash scripts/verify-production-release.sh public
 
 Completion: every command exits successfully and the tested `public/` directory contains only approved public content. Do not rebuild between acceptance, verification, and upload.
 
+### Prepare selected local changes
+
+Use the preparation command when a checkout also contains drafts, unrelated edits, or unpublished commits:
+
+```sh
+npm run release:prepare -- --output /tmp/site-release-review -- assets/css/site.css static/favicon.svg
+```
+
+Pass exact repository-relative file paths after `--`. It selects each file's current local edits relative to `HEAD`, including staged and unstaged changes, selected new files, and deletions. It applies that patch to the cached `origin/master` revision in a separate checkout. Unselected files and unpublished commits stay outside the candidate, including committed changes in a selected file. A patch that conflicts with the publication baseline fails. Directories, globs, submodules, and symlinks are not selections; committed changes alone are not local edits. Ignored files are refused.
+
+Refresh the publication baseline with `git fetch origin master` when needed. Preparation does not fetch, push, or deploy. `--remote` and `--branch` select another publication tracking branch; the publishing command must still check its current remote revision.
+
+The output directory must be new and outside the source checkout; omit `--output` to create one in the system temporary directory. Preparation initializes the candidate's submodules and npm dependencies, builds its canonical `checkout/public` once, runs the complete `npm test` against that artifact, and verifies its release boundary. It checks that acceptance and release verification did not change the artifact or tracked candidate source. The source checkout, index, and existing artifact remain intact.
+
+The command returns one JSON result with the candidate ID, status, receipt path, checkout, and revision. The local `candidate.json` receipt records the publication baseline, selected paths, candidate revision and tree, artifact digest, individual check results, phase timings, and full log locations. Only `ready` means every check passed; a failure exits unsuccessfully, retains a failed receipt and available logs, and cannot be treated as ready. Review the prepared checkout and retain its unchanged artifact for publication.
+
+When changing delivery commands, run `npm run test:release-preparation` as well as `npm test`. The preparation regression suite exercises the complete command in temporary Git repositories with real production and acceptance gates. It runs separately from the production test path to keep publication checks within their runtime budget.
+
 ## 5. Publish
 
 Merge the reviewed change to `master`. GitHub Actions builds the canonical production artifact once, runs the acceptance and release gates against it, and submits that same artifact to GitHub Pages. A failed build, test, privacy gate, or release check blocks upload and deployment.
