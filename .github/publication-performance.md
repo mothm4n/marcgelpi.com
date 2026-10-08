@@ -34,3 +34,9 @@ Issue #39 tested persisting Hugo's file cache with a key containing the runner o
 All four runs passed the complete acceptance suite with 28 Hugo invocations, production build, release verification, artifact upload, and deployment. The cold and warm production artifacts had the same content digest, `e33452b13d7719f97057c26f5b7af6ecf1251f76d1405204d21f21e0cac80c7c`.
 
 The median warm improvement was **-460.1%**, below the required 10% gain. Acceptance already warms Hugo's temporary cache before the final production build, so restoring the small persistent cache added more time than it saved. The persistence experiment was therefore removed; CI retains Hugo's per-run temporary cache without adding restore or save actions.
+
+## Hourly publication check
+
+An unchanged scheduled run uses the runner's existing Node runtime and read-only GitHub API calls to compare content eligibility with the last successful Pages deployment. It skips Hugo installation, browser dependencies, acceptance, and deployment. Push and manual runs still execute every release gate.
+
+A successful release captures publication state with two counted Hugo list invocations at the canonical artifact's fixed build time. The state contains dates and opaque identifiers, excludes drafts, and is preserved only after Pages deployment succeeds. Timing reports include capture and preservation as separate phases. No build or dependency cache is added. Missing or unusable state takes the full release path. See [the scheduling procedure](../docs/publication-workflow.md#6-schedule-an-approved-article).
