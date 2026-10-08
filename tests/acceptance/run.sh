@@ -5,7 +5,12 @@ set -euo pipefail
 acceptance_directory=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 acceptance_repo_root=$(cd "$acceptance_directory/../.." && pwd)
 acceptance_timing_script="$acceptance_repo_root/scripts/publication-timing.sh"
-acceptance_timing_tmp=$(mktemp -d "${TMPDIR:-/tmp}/acceptance-timing.XXXXXX")
+if [[ -n "${ACCEPTANCE_REPORT_DIRECTORY:-}" ]]; then
+  mkdir -p "$ACCEPTANCE_REPORT_DIRECTORY"
+  acceptance_timing_tmp=$(cd "$ACCEPTANCE_REPORT_DIRECTORY" && pwd -P)
+else
+  acceptance_timing_tmp=$(mktemp -d "${TMPDIR:-/tmp}/acceptance-timing.XXXXXX")
+fi
 acceptance_timings="$acceptance_timing_tmp/journeys.tsv"
 playwright_timings="$acceptance_timing_tmp/playwright-journeys.tsv"
 playwright_build_report="$acceptance_timing_tmp/playwright-standard-builds.tsv"
@@ -17,9 +22,27 @@ export PLAYWRIGHT_BUILD_REPORT="$playwright_build_report"
 export PLAYWRIGHT_ARTIFACT_REPORT="$playwright_artifact_report"
 export PLAYWRIGHT_FIXTURE_BUILD_REPORT="$playwright_fixture_build_report"
 export PLAYWRIGHT_FAILURE_SUMMARY="$acceptance_repo_root/test-results/failure-summary.tsv"
+if [[ -n "${ACCEPTANCE_REPORT_DIRECTORY:-}" ]]; then
+  export PLAYWRIGHT_FAILURE_SUMMARY="$acceptance_timing_tmp/failure-summary.tsv"
+  rm -f "$PLAYWRIGHT_FAILURE_SUMMARY"
+fi
 printf '0\n' >"$HUGO_BUILD_COUNT_FILE"
 touch "$acceptance_timings" "$playwright_fixture_build_report"
-trap 'rm -rf "$acceptance_timing_tmp"' EXIT
+cleanup_acceptance_reports() {
+  acceptance_exit_status=$?
+  if [[ -n "${ACCEPTANCE_REPORT_DIRECTORY:-}" ]]; then
+    if [[ -f "$PLAYWRIGHT_FAILURE_SUMMARY" ]]; then
+      if ! (mkdir -p "$acceptance_repo_root/test-results" &&
+        cp "$PLAYWRIGHT_FAILURE_SUMMARY" "$acceptance_repo_root/test-results/failure-summary.tsv"); then
+        echo "Could not copy sanitized failure summary; retained at $PLAYWRIGHT_FAILURE_SUMMARY" >&2
+      fi
+    fi
+  else
+    rm -rf "$acceptance_timing_tmp"
+  fi
+  exit "$acceptance_exit_status"
+}
+trap cleanup_acceptance_reports EXIT
 
 acceptance_started_at=$(date +%s)
 
