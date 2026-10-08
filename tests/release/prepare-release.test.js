@@ -100,6 +100,7 @@ test('preparation verifies only selected local changes and preserves other work'
     GIT_INDEX_FILE: path.join(f.source, '.git/index'),
     HUGO_BUILD_COUNT_FILE: path.join(f.source, 'private.txt'),
     HUGO_CACHE_DIR: path.join(f.source, 'public'),
+    ACCEPTANCE_REPORT_DIRECTORY: path.join(f.source, 'public'),
   });
   assert.equal(prepared.status, 0, prepared.stderr);
   assert.equal(prepared.result.status, 'ready');

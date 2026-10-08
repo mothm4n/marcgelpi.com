@@ -133,6 +133,7 @@ try {
     selection: { sourceRevision, paths }, checkout: path.join(output, 'checkout'),
     revision: null, tree: null, artifact: { directory: path.join(output, 'checkout/public'), digest: null },
     checks: { build: 'pending', acceptance: 'pending', release: 'pending', artifact: 'pending', source: 'pending' },
+    reports: { acceptance: path.join(output, 'acceptance-reports') },
     timings: { build: 0, acceptance: 0, release: 0, artifact: 0, source: 0, total: 0 },
     logs: Object.fromEntries(['preparation', 'build', 'acceptance', 'release'].map((name) => [name, path.join(logsDirectory, `${name}.log`)])),
   };
@@ -160,7 +161,7 @@ try {
   receipt.tree = git(receipt.checkout, ['rev-parse', 'HEAD^{tree}']);
   saveReceipt();
 
-  const checkEnv = { ...releaseEnv, PLAYWRIGHT_PRODUCTION_ARTIFACT: receipt.artifact.directory };
+  const checkEnv = { ...releaseEnv, PLAYWRIGHT_PRODUCTION_ARTIFACT: receipt.artifact.directory, ACCEPTANCE_REPORT_DIRECTORY: receipt.reports.acceptance };
   // Content and fixed-clock overrides are for fixtures, never release candidates.
   delete checkEnv.SITE_CONTENT_DIR;
   delete checkEnv.SITE_BUILD_CLOCK;
