@@ -185,6 +185,7 @@ test('Density quality journey', async ({ page }) => {
   for (const [, routePath, maximumHeight] of densityTargets) {
     await page.goto(`${previewBaseURL}${routePath}`);
     await page.setViewportSize({ width: 390, height: 844 });
+    await expectNoHorizontalOverflow(page);
     expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBeLessThanOrEqual(maximumHeight);
   }
 
