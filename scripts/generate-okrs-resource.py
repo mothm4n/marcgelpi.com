@@ -451,6 +451,130 @@ def build_document_from_html(source_html: Path, hero_path: Path, destination: Pa
     document.save(destination)
 
 
+def add_workbook_prompt(document: Document, question: dict, resource: dict) -> None:
+    if "objection_index" in question:
+        objection = resource["guide_revision"]["objections"][question["objection_index"]]
+        heading = document.add_heading(f'“{objection["title"]}”', level=2)
+        prompt = document.add_paragraph(question["question"])
+        prompt.paragraph_format.keep_with_next = True
+    else:
+        heading = document.add_heading(question["question"], level=2)
+    heading.paragraph_format.keep_with_next = True
+    if question.get("hint"):
+        hint = document.add_paragraph(question["hint"], style="Worksheet hint")
+        hint.paragraph_format.keep_with_next = True
+    for index in range(question["lines"]):
+        answer = document.add_paragraph(" ", style="Worksheet answer")
+        answer.paragraph_format.keep_with_next = index < question["lines"] - 1
+        set_paragraph_border(answer)
+
+
+def build_field_guide(resource: dict, guide: dict, hero_path: Path, destination: Path) -> None:
+    document = Document()
+    configure_document(document)
+    normal = document.styles["Normal"]
+    normal.paragraph_format.line_spacing = 1.08
+    normal.paragraph_format.space_after = Pt(6)
+    document.styles["Heading 1"].font.size = Pt(23)
+    document.styles["Heading 1"].paragraph_format.space_after = Pt(9)
+    document.styles["Heading 2"].paragraph_format.space_before = Pt(10)
+    document.styles["Heading 2"].paragraph_format.space_after = Pt(3)
+    hint = document.styles.add_style("Worksheet hint", WD_STYLE_TYPE.PARAGRAPH)
+    hint.base_style = normal
+    hint.font.size = Pt(9.5)
+    hint.font.color.rgb = RGBColor.from_string(MUTED)
+    hint.paragraph_format.space_after = Pt(3)
+    set_language(hint)
+    answer = document.styles.add_style("Worksheet answer", WD_STYLE_TYPE.PARAGRAPH)
+    answer.base_style = normal
+    answer.paragraph_format.space_after = Pt(7)
+    answer.paragraph_format.line_spacing = 1.0
+    set_language(answer)
+    properties = document.core_properties
+    properties.title = guide["title"]
+    properties.author = "Marc Gelpi"
+    properties.subject = guide["description"]
+    properties.keywords = "OKRs, field guide, meeting preparation, proposal"
+    properties.language = "en-US"
+
+    add_label(document, "Meeting preparation / Field guide")
+    document.add_paragraph(guide["title"], style="Title")
+    add_image(document, hero_path, 4.5,
+              "Abstract petrol, charcoal and copper forms converging around a precise area of negative space.")
+    document.add_heading(guide["heading"], level=2)
+    document.add_paragraph(guide["description"])
+    document.add_paragraph(guide["instructions"])
+    document.add_paragraph(guide["unknowns"], style="Worksheet hint")
+    add_label(document, "Work through these steps")
+    for index, step in enumerate(guide["steps"], start=1):
+        document.add_paragraph(f'{index}. {step["title"]}')
+    document.add_paragraph("Then complete your proposal and check the worked example.", style="Worksheet hint")
+
+    for index, step in enumerate(guide["steps"], start=1):
+        document.add_page_break()
+        add_label(document, f"Step {index} of {len(guide['steps'])}")
+        document.add_heading(step["title"], level=1)
+        document.add_paragraph(step["intro"])
+        for question in step["questions"]:
+            add_workbook_prompt(document, question, resource)
+        output = document.add_paragraph(step["output"])
+        output.paragraph_format.space_before = Pt(10)
+        output.runs[0].bold = True
+        set_run_color(output.runs[0], PETROL)
+        if step.get("note"):
+            document.add_paragraph(step["note"], style="Worksheet hint")
+
+    proposal = resource["pilot_proposal"]
+    document.add_page_break()
+    add_label(document, "Take this page to the meeting")
+    document.add_heading(guide["proposal_heading"], level=1)
+    document.add_paragraph(guide["proposal_intro"])
+    for field in proposal["fields"]:
+        label = document.add_heading(field["label"], level=2)
+        label.paragraph_format.space_before = Pt(6)
+        label.paragraph_format.keep_with_next = True
+        prompt = document.add_paragraph(field["prompt"].strip("[]"), style="Worksheet hint")
+        prompt.paragraph_format.keep_with_next = True
+        document.add_paragraph(" ", style="Worksheet answer")
+        set_paragraph_border(document.paragraphs[-1])
+
+    document.add_page_break()
+    add_label(document, "Completed example / Invented details")
+    document.add_heading(proposal["example_heading"], level=1)
+    document.add_paragraph(proposal["example_intro"])
+    for index, field in enumerate(proposal["fields"]):
+        if index == 7:
+            document.add_page_break()
+            add_label(document, "Completed example / Continued")
+            document.add_heading(guide["example_continued_heading"], level=1)
+        label = document.add_heading(field["label"], level=2)
+        label.paragraph_format.space_before = Pt(7)
+        label.paragraph_format.keep_with_next = True
+        for value in field["example"]:
+            paragraph = document.add_paragraph(value)
+            paragraph.runs[0].font.size = Pt(10)
+            paragraph.paragraph_format.line_spacing = 1.0
+            paragraph.paragraph_format.space_after = Pt(3)
+            paragraph.paragraph_format.widow_control = True
+        for value in field.get("checks", []):
+            paragraph = document.add_paragraph(value, style="List Bullet")
+            paragraph.runs[0].font.size = Pt(10)
+            paragraph.paragraph_format.line_spacing = 1.0
+            paragraph.paragraph_format.space_after = Pt(3)
+
+    document.add_heading(guide["further_reading_heading"], level=2)
+    paragraph = document.add_paragraph(style="Worksheet hint")
+    add_hyperlink(paragraph, "Read How to sell OKRs internally", "https://marcgelpi.com/resources/how-to-sell-okrs/")
+    paragraph = document.add_paragraph(style="Worksheet hint")
+    add_hyperlink(paragraph, proposal["case_link"]["label"], urljoin("https://marcgelpi.com/", proposal["case_link"]["href"]))
+    source = resource["guide_revision"]["source"]
+    paragraph = document.add_paragraph(f'Read the {source["attribution"]} ', style="Worksheet hint")
+    add_hyperlink(paragraph, source["link_label"], source["url"])
+    paragraph = document.add_paragraph(style="Worksheet hint")
+    add_hyperlink(paragraph, "Discuss your organizational problem with Marc", "https://marcgelpi.com/contact/")
+    document.save(destination)
+
+
 def export_tagged_pdf(source: Path, output: Path) -> None:
     soffice = shutil.which("soffice")
     if not soffice:
@@ -483,8 +607,10 @@ def export_tagged_pdf(source: Path, output: Path) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("output", nargs="?", default="output/pdf/how-to-sell-okrs.pdf")
-    parser.add_argument("--source-html", type=Path, help="Export the editorial article from a clean Hugo development build")
+    parser.add_argument("output", nargs="?")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--source-html", type=Path, help="Export the editorial article from a clean Hugo development build")
+    mode.add_argument("--field-guide", action="store_true", help="Build the meeting preparation workbook from the guide questions and shared example")
     args = parser.parse_args()
     repo_root = Path(__file__).resolve().parent.parent
     temporary_root = repo_root / "tmp/pdfs"
@@ -492,12 +618,20 @@ def main() -> None:
     with tempfile.TemporaryDirectory(prefix="okrs-resource-", dir=temporary_root) as temporary_directory:
         source = Path(temporary_directory) / "how-to-sell-okrs.docx"
         hero_path = repo_root / "assets/images/resources/okrs-focus-abstract.png"
-        if args.source_html:
+        if args.field_guide:
+            resource = json.loads((repo_root / "data/resources/how_to_sell_okrs.json").read_text())
+            guide = json.loads((repo_root / "data/resources/how_to_sell_okrs_field_guide.json").read_text())
+            build_field_guide(resource, guide, hero_path, source)
+        elif args.source_html:
             build_document_from_html(args.source_html, hero_path, source)
         else:
             resource = json.loads((repo_root / "data/resources/how_to_sell_okrs.json").read_text())
             build_document(resource, hero_path, source)
-        export_tagged_pdf(source, repo_root / args.output)
+        output = args.output or (
+            "output/pdf/how-to-sell-okrs-field-guide-review.pdf"
+            if args.field_guide else "output/pdf/how-to-sell-okrs.pdf"
+        )
+        export_tagged_pdf(source, repo_root / output)
 
 
 if __name__ == "__main__":

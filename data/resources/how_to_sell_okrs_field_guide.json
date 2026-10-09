@@ -1,0 +1,85 @@
+{
+  "title": "How to sell OKRs internally",
+  "heading": "Take your proposal to the meeting.",
+  "description": "Use the field guide to prepare the problem, your proposal and your manager’s questions.",
+  "instructions": "Answer the questions before you meet your manager. Write in the spaces or keep your answers in a separate document. Then complete the proposal on page 8.",
+  "unknowns": "If you do not know an answer, record what you need to check and who can check it. Ask the teams involved before you promise their time.",
+  "steps": [
+    {
+      "title": "Bring a concrete problem",
+      "intro": "Choose one problem your manager needs to solve. Bring an example you can show.",
+      "questions": [
+        {"question": "Which problem needs attention?", "hint": "Describe what people do or what happens. For example, teams discover too late that they need work from each other.", "lines": 2},
+        {"question": "What happened in a recent example?", "hint": "Record the date, the people or teams affected, and the evidence you can show.", "lines": 2},
+        {"question": "What did that problem cost?", "hint": "Use a missed date, repeated work, customer delays or time lost. Mark estimates as estimates.", "lines": 2},
+        {"question": "Why does your manager need to act now?", "hint": "Connect the problem to a result your manager is responsible for.", "lines": 2}
+      ],
+      "output": "Use these answers for The problem in your proposal. Describe the problem and its cost in one or two sentences."
+    },
+    {
+      "title": "Define the result you want",
+      "intro": "OKR means Objectives and Key Results. An objective describes the result you want. A key result sets a measurable target and a deadline.",
+      "questions": [
+        {"question": "What should improve for customers or teams?", "hint": "Describe the result, such as fewer avoidable delays. Completing a list of tasks does not show that the result improved.", "lines": 2},
+        {"question": "How will you measure that result?", "hint": "Define what you count, who or what you include, and where the data comes from.", "lines": 2},
+        {"question": "What is the starting figure?", "hint": "Record the number, the period measured and its source. If it is unknown, agree how to establish it before the cycle.", "lines": 2},
+        {"question": "What target will you propose, and by when?", "hint": "Agree whether the target is a firm commitment or an ambition to explore.", "lines": 2}
+      ],
+      "output": "Use these answers for The shared goal. Write the objective, the measure, the starting figure, the target and the deadline."
+    },
+    {
+      "title": "Make room for one cycle",
+      "intro": "Propose one part of the service and a few teams. Keep the measures you already use for finances and daily work.",
+      "questions": [
+        {"question": "Which part of the service and which teams will take part?", "hint": "State what stays outside the cycle. Any wider use needs another decision.", "lines": 2},
+        {"question": "Who will organize the cycle and record decisions?", "hint": "Name one person and check that they have time for the work.", "lines": 1},
+        {"question": "Which manager can decide what work comes first?", "hint": "Choose someone who can resolve conflicts between the teams and let tasks wait.", "lines": 1},
+        {"question": "Which tasks can wait to make time for the cycle?", "hint": "Agree this with the manager and the teams. Record what permission they need.", "lines": 2},
+        {"question": "Which meeting or report will this replace?", "hint": "Keep regular team planning. Keep the cycle separate from pay and individual performance reviews.", "lines": 1}
+      ],
+      "output": "Complete The scope, Who runs the test and What this replaces. Add the required authority and time to Permission we need.",
+      "note": "If leaders cannot agree on the problem, who decides or what work can wait, ask for those decisions first."
+    },
+    {
+      "title": "Set the dates and reviews",
+      "intro": "Choose a period that gives you time to observe the result. The example uses three months. Some results need longer or several cycles.",
+      "questions": [
+        {"question": "When will the cycle start and end?", "hint": "Allow time to carry out the work and observe the result.", "lines": 2},
+        {"question": "When will you review how the teams work?", "hint": "Use an early review to check the shared goal, priority decisions, dependencies and meeting effort. Adjust the work then.", "lines": 2},
+        {"question": "When will you review results and learning?", "hint": "Set the final review after the last measured day. Compare the result with the starting figure and target.", "lines": 2},
+        {"question": "Who will meet each week, and what will they record?", "hint": "Agree the meeting length. Name who records results, obstacles, decisions, needs between teams and meeting time.", "lines": 2}
+      ],
+      "output": "Complete The dates, The weekly meeting and What we will check. Give the early and final reviews different purposes.",
+      "note": "For the customer-delay example, count each customer once by their agreed start date. Include customers still waiting. Report counts with percentages. If no customers were due to start, report that there is no customer evidence."
+    },
+    {
+      "title": "Agree how you will decide afterwards",
+      "intro": "Discuss these questions with the manager and teams before the cycle. Review the result together with decisions, learning and the effort required.",
+      "questions": [
+        {"question": "What evidence will you need for a useful review?", "hint": "Agree the data and recorded decisions you need. There is no minimum customer count that fits every situation.", "lines": 1},
+        {"question": "When would another limited cycle be useful?", "hint": "Look for useful decisions and coordination, manageable meeting time and a reasoned next action. Missing the target does not automatically end the test.", "lines": 1},
+        {"question": "What would make you change the approach?", "hint": "Adapt if the cycle helps but coordination problems remain, meetings take too much time or results call for a different approach.", "lines": 1},
+        {"question": "What would make you stop?", "hint": "Stop if there is no observable value, managers refuse to make time or they use the cycle to judge individual performance.", "lines": 1},
+        {"question": "What will you do if there is too little evidence?", "hint": "Record what remains unknown. Agree whether another limited cycle could provide useful evidence.", "lines": 1}
+      ],
+      "output": "Complete When we will continue, adapt or stop. Name who makes the final decision and include them in Permission we need.",
+      "note": "A better result alone does not prove that OKRs caused it. Record other changes that could explain the result."
+    },
+    {
+      "title": "Prepare for your manager’s questions",
+      "intro": "Use the questions below to prepare specific answers. Check the proposed trade-offs with the teams before the meeting.",
+      "questions": [
+        {"objection_index": 0, "question": "Which meeting, report or task can you replace or postpone?", "lines": 2},
+        {"objection_index": 1, "question": "How will you record why a priority changes and what must wait?", "lines": 2},
+        {"objection_index": 2, "question": "What evidence will you review besides the number? How will you keep pay and individual reviews separate?", "lines": 2},
+        {"objection_index": 3, "question": "Which existing measures will you keep, and which result needs change now?", "lines": 2}
+      ],
+      "output": "Complete the proposal on the next page. Open the meeting with the problem, show your proposed cycle and ask for a decision.",
+      "note": "Before you leave, record what the manager approved, what remains unresolved, who will act and the next date. If they need more evidence, agree who will find it and when."
+    }
+  ],
+  "proposal_heading": "Your proposal for the meeting",
+  "proposal_intro": "Use your answers to complete these ten fields. Take a copy to the meeting. Mark any point that still needs agreement.",
+  "example_continued_heading": "Example: reviews and permission",
+  "further_reading_heading": "Keep the guide and article together"
+}

@@ -1,5 +1,5 @@
 {{ define "main" }}
-  {{ $download := resources.Get .Params.download_asset }}
+  {{ $downloadAsset := .Params.download_asset }}
   {{ $hero := resources.Get .Params.hero_asset }}
   {{ $revision := partial "resources/okrs-guide-revision.html" . }}
   {{ $deck := .Description }}
@@ -8,8 +8,18 @@
     {{ $deck = .Description }}
     {{ with .Params.audience }}{{ $audience = . }}{{ end }}
     {{ with .Params.download_asset }}
-      {{ $download = resources.Get . | resources.Copy $.Params.download_asset }}
+      {{ $downloadAsset = . }}
     {{ end }}
+  {{ end }}
+  {{ $fieldGuide := partial "resources/okrs-field-guide-revision.html" . }}
+  {{ with $fieldGuide }}
+    {{ with .Params.download_asset }}
+      {{ $downloadAsset = . }}
+    {{ end }}
+  {{ end }}
+  {{ $download := resources.Get $downloadAsset }}
+  {{ if and $download (ne $downloadAsset .Params.download_asset) }}
+    {{ $download = $download | resources.Copy .Params.download_asset }}
   {{ end }}
   <article class="resource-article">
     <header class="resource-hero">
@@ -18,6 +28,12 @@
         <h1>{{ .Title }}</h1>
         <p class="resource-deck">{{ $deck }}</p>
         <p class="resource-meta">{{ .Params.duration_minutes }}-minute guide · {{ $audience }}</p>
+        {{ with $fieldGuide }}
+          {{ $approved := and (not .Draft) (partial "publication-record-approved.html" .Params) }}
+          {{ if not $approved }}
+            <p class="eyebrow" data-publication-review-banner data-field-guide-review-banner>Field guide PDF · Pending editorial review</p>
+          {{ end }}
+        {{ end }}
         {{ with $download }}
           <a class="resource-download" href="{{ .RelPermalink }}" download>
             Download the field guide <span aria-hidden="true">↓</span>

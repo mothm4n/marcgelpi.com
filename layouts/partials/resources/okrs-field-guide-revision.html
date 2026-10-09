@@ -1,0 +1,10 @@
+{{ $revision := false }}
+{{ if eq .RelPermalink "/resources/how-to-sell-okrs/" }}
+  {{ with .Resources.Get "field-guide.md" }}
+    {{ $approved := and (not .Draft) (partial "publication-record-approved.html" .Params) }}
+    {{ if or (not hugo.IsProduction) $approved }}
+      {{ $revision = . }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+{{ return $revision }}

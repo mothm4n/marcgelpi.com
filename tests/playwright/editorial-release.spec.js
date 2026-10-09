@@ -391,6 +391,10 @@ test('OKR pilot proposal review journey', async ({ page, canonicalArtifacts, cre
   const approved = /^draft: false$/m.test(revision) && publicationRecordIsApproved(revision, 'publication');
   const publishedPDF = await fs.readFile(path.join(repoRoot, 'assets/downloads/how-to-sell-okrs.pdf'));
   const reviewPDF = await fs.readFile(path.join(repoRoot, 'assets/downloads/how-to-sell-okrs-review.pdf'));
+  const fieldGuidePath = 'resources/how-to-sell-okrs/field-guide.md';
+  const fieldGuide = await fs.readFile(path.join(repoRoot, 'content', fieldGuidePath), 'utf8');
+  const fieldGuideApproved = /^draft: false$/m.test(fieldGuide) && publicationRecordIsApproved(fieldGuide, 'publication');
+  const fieldGuidePDF = await fs.readFile(path.join(repoRoot, 'assets/downloads/how-to-sell-okrs-field-guide-review.pdf'));
   const expectDownloadEdition = async (expectedPDF) => {
     const downloads = page.locator('main a[download]');
     await expect(downloads).toHaveCount(2);
@@ -403,13 +407,15 @@ test('OKR pilot proposal review journey', async ({ page, canonicalArtifacts, cre
     }
     const hiddenAsset = await page.request.get(new URL('/downloads/how-to-sell-okrs-review.pdf', page.url()).href);
     expect(hiddenAsset.status()).toBe(404);
+    const hiddenFieldGuide = await page.request.get(new URL('/downloads/how-to-sell-okrs-field-guide-review.pdf', page.url()).href);
+    expect(hiddenFieldGuide.status()).toBe(404);
   };
   expect(reviewPDF.equals(publishedPDF)).toBe(false);
   expect(reviewPDF.toString('latin1')).toContain('/StructTreeRoot');
   expect(reviewPDF.toString('latin1')).toMatch(/\/Marked\s+true/);
 
   await page.goto('/resources/how-to-sell-okrs/');
-  await expectDownloadEdition(approved ? reviewPDF : publishedPDF);
+  await expectDownloadEdition(fieldGuideApproved ? fieldGuidePDF : approved ? reviewPDF : publishedPDF);
   await expect(page.getByRole('heading', { name: exampleHeading })).toHaveCount(approved ? 1 : 0);
   await expect(page.getByRole('heading', { name: briefHeading })).toHaveCount(approved ? 1 : 0);
   expect(await directoryContains(canonicalArtifacts.productionDirectory, exampleHeading)).toBe(approved);
@@ -432,7 +438,8 @@ test('OKR pilot proposal review journey', async ({ page, canonicalArtifacts, cre
   await expect(example).toContainText('Do not report a 0% delay rate');
   await expect(example).toContainText('even if the teams miss the target');
   await expect(page.locator('.resource-article-body')).not.toContainText(/six[- ]week|customer onboarding/i);
-  await expectDownloadEdition(reviewPDF);
+  await expectDownloadEdition(fieldGuidePDF);
+  await expect(page.locator('[data-field-guide-review-banner]')).toHaveCount(fieldGuideApproved ? 0 : 1);
 
   const exampleFields = await example.locator('dt').allTextContents();
   const briefFields = await brief.locator('strong').allTextContents();
@@ -458,6 +465,14 @@ test('OKR pilot proposal review journey', async ({ page, canonicalArtifacts, cre
 
   const fixture = await createContentFixture();
   const fixtureRevision = path.join(fixture.directory, revisionPath);
+  const fixtureFieldGuide = path.join(fixture.directory, fieldGuidePath);
+  const pendingFieldGuide = fieldGuide
+    .replace(/^draft:.*$/m, 'draft: true')
+    .replace(/^  status:.*$/m, '  status: "review"')
+    .replace(/^  reviewed_by:.*$/m, '  reviewed_by: ""')
+    .replace(/^  reviewed_at:.*$/m, '  reviewed_at: ""')
+    .replace(/^  privacy_reviewed:.*$/m, '  privacy_reviewed: false');
+  await fs.writeFile(fixtureFieldGuide, pendingFieldGuide);
   const pendingRevision = revision
     .replace(/^draft:.*$/m, 'draft: true')
     .replace(/^  status:.*$/m, '  status: "review"')
@@ -489,6 +504,28 @@ test('OKR pilot proposal review journey', async ({ page, canonicalArtifacts, cre
   await expect(page.locator('[data-publication-review-banner]')).toHaveCount(0);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('How to sell OKRs internally');
   await expectDownloadEdition(reviewPDF);
+  await expect(page.locator('[data-field-guide-review-banner]')).toHaveCount(0);
+
+  const incompleteFieldGuide = pendingFieldGuide
+    .replace('draft: true', 'draft: false')
+    .replace('status: "review"', 'status: "approved"');
+  await fs.writeFile(fixtureFieldGuide, incompleteFieldGuide);
+  const incompleteFieldGuideArtifact = await createIsolatedArtifact({ contentDirectory: fixture.directory });
+  await page.goto(`${incompleteFieldGuideArtifact.url}/resources/how-to-sell-okrs/`);
+  await expectDownloadEdition(reviewPDF);
+  await expect(page.getByRole('heading', { name: exampleHeading })).toHaveCount(1);
+
+  const approvedFieldGuide = incompleteFieldGuide
+    .replace('reviewed_by: ""', 'reviewed_by: "Editorial review fixture"')
+    .replace('reviewed_at: ""', 'reviewed_at: "2026-10-09"')
+    .replace('privacy_reviewed: false', 'privacy_reviewed: true');
+  await fs.writeFile(fixtureFieldGuide, approvedFieldGuide);
+  const approvedFieldGuideArtifact = await createIsolatedArtifact({ contentDirectory: fixture.directory });
+  await page.goto(`${approvedFieldGuideArtifact.url}/resources/how-to-sell-okrs/`);
+  await expectDownloadEdition(fieldGuidePDF);
+  await expect(page.locator('[data-publication-review-banner]')).toHaveCount(0);
+  const hiddenFieldGuidePage = await page.request.get(new URL('/resources/how-to-sell-okrs/field-guide/', page.url()).href);
+  expect(hiddenFieldGuidePage.status()).toBe(404);
 });
 
 test('SEO backlog release journey', async ({ page, canonicalArtifacts }) => {
