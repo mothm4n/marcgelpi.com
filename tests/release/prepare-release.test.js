@@ -4,6 +4,7 @@ const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 const { test } = require('node:test');
+const { git, createReleaseSource, commitPublishedBaseline } = require('./release-fixture');
 
 const repository = path.resolve(__dirname, '../..');
 const command = path.join(repository, 'scripts/prepare-release.js');
@@ -11,41 +12,14 @@ let nextPort = 4870;
 const regressionLog = path.join(os.tmpdir(), `release-preparation-tests-${process.pid}.log`);
 console.log(`Full command logs: ${regressionLog}`);
 
-function run(program, args, cwd, options = {}) {
-  const result = spawnSync(program, args, { cwd, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024, ...options });
-  if (result.status !== 0) throw new Error(`${program} failed (${result.status}): ${result.stderr || result.stdout}`);
-  return result.stdout.trim();
-}
-
-function git(cwd, ...args) { return run('git', args, cwd); }
-
 function fixture(t, trailingBlankLines = false) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'release-preparation-test-'));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
-  const source = path.join(root, 'source');
-  fs.mkdirSync(source);
-  const archive = spawnSync('git', ['archive', 'HEAD'], { cwd: repository, maxBuffer: 32 * 1024 * 1024 });
-  assert.equal(archive.status, 0);
-  run('tar', ['-xf', '-', '-C', source], repository, { input: archive.stdout });
-  fs.rmSync(path.join(source, '.gitmodules'), { force: true });
-  const common = git(repository, 'rev-parse', '--git-common-dir');
-  const themeGit = path.resolve(repository, common, 'modules/themes/blowfish');
-  const themeRevision = git(repository, 'rev-parse', 'HEAD:themes/blowfish');
-  const themeArchive = path.join(root, 'theme.tar');
-  run('git', [`--git-dir=${themeGit}`, 'archive', '--output', themeArchive, themeRevision], repository);
-  const themeDirectory = path.join(source, 'themes/blowfish');
-  fs.mkdirSync(themeDirectory, { recursive: true });
-  run('tar', ['-xf', themeArchive, '-C', themeDirectory], repository);
-  fs.rmSync(themeArchive);
+  const source = createReleaseSource(root);
   fs.writeFileSync(path.join(source, 'static/selected.txt'), 'base first\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\nbase last\n' + (trailingBlankLines ? '\n\n' : ''));
   fs.writeFileSync(path.join(source, 'static/unrelated.txt'), 'base unrelated\n');
   fs.writeFileSync(path.join(source, 'static/retire.txt'), 'retire this\n');
-  git(source, 'init', '-b', 'master');
-  git(source, 'config', 'user.email', 'release-test@example.invalid');
-  git(source, 'config', 'user.name', 'Release Test');
-  git(source, 'add', '.');
-  git(source, 'commit', '-qm', 'Published baseline');
-  const baseline = git(source, 'rev-parse', 'HEAD');
+  const baseline = commitPublishedBaseline(source);
   git(source, 'update-ref', 'refs/remotes/origin/master', baseline);
   return { root, source, baseline, output: path.join(root, 'candidate') };
 }

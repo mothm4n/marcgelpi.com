@@ -42,9 +42,12 @@ else
     ' "$failure_report"
   else
     awk '
-      /^FAIL:/ {
+      /^FAIL:/ || /^[[:space:]]*not ok [0-9]+([[:space:]]|$)/ {
         failures++
-        if (failures <= 8) printf "  - %s\n", substr($0, 1, 240)
+        if (failures <= 8) {
+          sub(/^[[:space:]]*/, "")
+          printf "  - %s\n", substr($0, 1, 240)
+        }
       }
       END {
         if (failures > 8) printf "  - %d further failed checks; see the full log\n", failures - 8

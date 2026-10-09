@@ -4,17 +4,10 @@ const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 const { test } = require('node:test');
+const { run, git, createReleaseSource, commitPublishedBaseline } = require('./release-fixture');
 
 const repository = path.resolve(__dirname, '../..');
 const command = path.join(repository, 'scripts/publish-release.js');
-
-function run(program, args, cwd, options = {}) {
-  const result = spawnSync(program, args, { cwd, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024, ...options });
-  assert.equal(result.status, 0, `${program}: ${result.stderr || result.stdout}`);
-  return result.stdout.trim();
-}
-
-function git(cwd, ...args) { return run('git', args, cwd); }
 
 function installAdapters(bin) {
   fs.writeFileSync(path.join(bin, 'gh'), `#!${process.execPath}\nconst fs = require('node:fs');\nconst fixture = JSON.parse(fs.readFileSync(process.env.PUBLICATION_API_FIXTURE, 'utf8'));\nconst args = process.argv.slice(2);\nlet value;\nif (args[0] === 'repo' && args[1] === 'view') value = fixture.repository;\nelse if (args[0] === 'api' && args[1].includes('/actions/')) value = fixture.runs;\nelse if (args[0] === 'api' && args[1].includes('/statuses')) value = fixture.statuses;\nelse if (args[0] === 'api' && args[1].includes('/deployments?environment=')) value = fixture.currentDeployments || fixture.deployments;\nelse if (args[0] === 'api' && args[1].includes('/deployments')) value = fixture.deployments;\nelse throw new Error('Unexpected external GitHub request: ' + args.join(' '));\nprocess.stdout.write(JSON.stringify(value));\n`, { mode: 0o755 });
@@ -39,31 +32,13 @@ function readyFixture(t) {
   const root = reuseRoot || fs.mkdtempSync(path.join(os.tmpdir(), 'release-publication-test-'));
   if (reuseRoot) fs.mkdirSync(root);
   else t.after(() => fs.rmSync(root, { recursive: true, force: true }));
-  const source = path.join(root, 'source');
-  fs.mkdirSync(source);
-  const archive = spawnSync('git', ['archive', 'HEAD'], { cwd: repository, maxBuffer: 32 * 1024 * 1024 });
-  assert.equal(archive.status, 0);
-  run('tar', ['-xf', '-', '-C', source], repository, { input: archive.stdout });
-  fs.rmSync(path.join(source, '.gitmodules'));
-  const common = git(repository, 'rev-parse', '--git-common-dir');
-  const themeGit = path.resolve(repository, common, 'modules/themes/blowfish');
-  const themeArchive = path.join(root, 'theme.tar');
-  run('git', [`--git-dir=${themeGit}`, 'archive', '--output', themeArchive, git(repository, 'rev-parse', 'HEAD:themes/blowfish')], repository);
-  const theme = path.join(source, 'themes/blowfish');
-  fs.mkdirSync(theme, { recursive: true });
-  run('tar', ['-xf', themeArchive, '-C', theme], repository);
-  fs.rmSync(themeArchive);
+  const source = createReleaseSource(root);
   fs.writeFileSync(path.join(source, 'static/publisher-fixture.txt'), 'published baseline\n');
-  git(source, 'init', '-b', 'master');
-  git(source, 'config', 'user.email', 'publisher-test@example.invalid');
-  git(source, 'config', 'user.name', 'Publisher Test');
-  git(source, 'add', '.');
-  git(source, 'commit', '-qm', 'Published baseline');
+  const baseline = commitPublishedBaseline(source);
   const remote = path.join(root, 'origin.git');
   run('git', ['init', '--bare', remote], root);
   git(source, 'remote', 'add', 'origin', remote);
   git(source, 'push', 'origin', 'master');
-  const baseline = git(source, 'rev-parse', 'HEAD');
   fs.writeFileSync(path.join(source, 'static/publisher-fixture.txt'), 'approved candidate\n');
   const prepared = JSON.parse(run(process.execPath, [path.join(repository, 'scripts/prepare-release.js'), '--output', path.join(root, 'candidate'), '--', 'static/publisher-fixture.txt'], source, {
     env: { ...process.env, SITE_TEST_PORT: '4911', SITE_PREVIEW_TEST_PORT: '4912' },

@@ -248,7 +248,7 @@ jobs:
           printf '%s' "${PUBLICATION_TIMINGS_BASE64}" | base64 --decode >"${timings_file}"
           printf 'Deploy to GitHub Pages\t%s\n' "$((DEPLOY_FINISHED_AT - DEPLOY_STARTED_AT))" >>"${timings_file}"
           printf 'Preserve successful publication state\t%s\n' "$((finished_at - STATE_PRESERVATION_STARTED_AT))" >>"${timings_file}"
-          printf 'Total publication\t%s\n' "$((finished_at - PUBLICATION_STARTED_AT))" >>"${timings_file}"
+          printf 'Total publication\t%s\n' "$((DEPLOY_FINISHED_AT - PUBLICATION_STARTED_AT))" >>"${timings_file}"
           {
             printf '## Publication timing\n\n'
             printf '| Phase | Duration |\n'
