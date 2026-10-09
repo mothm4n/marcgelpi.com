@@ -3,7 +3,7 @@
 set -euo pipefail
 
 repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
-workflow="$repo_root/.github/workflows/publication.yaml"
+workflow="$repo_root/.github/workflows/hugo.yaml"
 server="$repo_root/scripts/serve-playwright-site.sh"
 digest_script="$repo_root/scripts/release-artifact-digest.js"
 release_verifier="$repo_root/scripts/verify-production-release.sh"

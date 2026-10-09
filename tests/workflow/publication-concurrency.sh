@@ -4,6 +4,9 @@ set -euo pipefail
 
 repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 workflow="$repo_root/.github/workflows/hugo.yaml"
+schedule="$repo_root/.github/workflows/scheduled-publication.yaml"
+test_tmp=$(mktemp -d "${TMPDIR:-/tmp}/publication-concurrency-test.XXXXXX")
+trap 'rm -rf "$test_tmp"' EXIT
 
 fail() {
   echo "FAIL: $1" >&2
@@ -19,41 +22,50 @@ contains() {
 contains 'branches:' "$workflow"
 contains '      - master' "$workflow"
 contains 'workflow_dispatch:' "$workflow"
-contains 'schedule:' "$workflow"
-contains "cron: '17 * * * *'" "$workflow"
-
-# GitHub admits concurrency before steps run and replaces pending members too.
-# A decision that skips publication must never enter the Pages group.
-if grep --quiet '^concurrency:' "$workflow"; then
-  fail "a skip-only hourly check can cancel an active or pending publication"
-fi
-preflight=$(sed -n '/^  preflight:/,/^  publication:/p' "$workflow")
-if grep --quiet 'concurrency:' <<<"$preflight"; then
-  fail "preflight must finish before entering publication concurrency"
-fi
-publication=$(sed -n '/^  publication:/,$p' "$workflow")
-grep --fixed-strings --quiet 'needs: preflight' <<<"$publication" || fail "publication must wait for its decision"
-grep --fixed-strings --quiet "if: \${{ needs.preflight.outputs.publish == 'true' }}" <<<"$publication" || fail "skip-only runs must not enter publication concurrency"
-grep --fixed-strings --quiet 'group: pages' <<<"$publication" || fail "real publications must share the Pages group"
-grep --fixed-strings --quiet 'cancel-in-progress: true' <<<"$publication" || fail "a newer real publication must replace the previous publication"
-[[ $(grep --count 'concurrency:' "$workflow") == 1 ]] || fail "only the complete publication unit may own concurrency"
-
-# One concurrency unit must retain the entire build-to-deployment sequence.
-release_path=$(sed -n 's@^    uses: \(\./\.github/workflows/[^ ]*\)$@\1@p' <<<"$publication")
-[[ -n "$release_path" && -f "$repo_root/$release_path" ]] || fail "publication must call its complete local release workflow"
-release_workflow="$repo_root/$release_path"
-contains 'workflow_call:' "$release_workflow"
-contains 'shell: bash' "$release_workflow"
-contains 'pages: write' "$release_workflow"
-contains 'id-token: write' "$release_workflow"
-contains '  build:' "$release_workflow"
-contains '  deploy:' "$release_workflow"
-contains 'needs: build' "$release_workflow"
-contains 'name: github-pages' "$release_workflow"
-contains 'name: Deploy to GitHub Pages' "$release_workflow"
-contains 'name: publication-success-state' "$release_workflow"
-if grep --quiet 'concurrency:' "$release_workflow"; then
-  fail "build and deployment must not compete with their enclosing publication lock"
+# Full requests join concurrency immediately, before any delayed decision can
+# reverse the order of old and new publication requests.
+grep --quiet '^concurrency:' "$workflow" || fail "full requests must enter Pages concurrency before work starts"
+contains 'group: pages' "$workflow"
+contains 'cancel-in-progress: true' "$workflow"
+contains 'needs: build' "$workflow"
+contains 'name: github-pages' "$workflow"
+contains 'name: Deploy to GitHub Pages' "$workflow"
+contains 'name: publication-success-state' "$workflow"
+if grep --quiet -E 'schedule:|scheduled-publication.js decide|needs: preflight' "$workflow"; then
+  fail "hourly decisions must not be admitted to full-publication concurrency"
 fi
 
-echo "PASS: skip-only checks preserve active and pending publications; newer real publications replace the complete release"
+[[ -f "$schedule" ]] || fail "the hourly decision workflow is missing"
+contains 'schedule:' "$schedule"
+contains "cron: '17 * * * *'" "$schedule"
+contains 'group: scheduled-publication-check' "$schedule"
+contains 'actions: write' "$schedule"
+contains 'deployments: read' "$schedule"
+contains 'id: decision' "$schedule"
+contains 'node scripts/scheduled-publication.js decide' "$schedule"
+if grep --quiet -E 'group: pages([[:space:]]|$)|pages: write|id-token: write|build-production.sh|actions/deploy-pages|npm ci' "$schedule"; then
+  fail "a skip-only check must never acquire or execute the full-publication unit"
+fi
+
+# GitHub runs this step only for publish=true; skip=false dispatches nothing.
+request=$(sed -n '/^      - name: Request current publication/,$p' "$schedule")
+grep --fixed-strings --quiet "if: \${{ steps.decision.outputs.publish == 'true' }}" <<<"$request" || fail "an unchanged decision must not dispatch a full publication"
+grep --fixed-strings --quiet 'GH_TOKEN: ${{ github.token }}' <<<"$request" || fail "publication dispatch must use the repository workflow token"
+
+# Exercise the actual external dispatch command with a stale event SHA. GitHub
+# must resolve the current master branch instead of receiving that old commit.
+dispatch_command=$(sed -n '/^        run: |/,$p' <<<"$request" | sed '1d; s/^          //')
+[[ -n "$dispatch_command" ]] || fail "the publication dispatch command is missing"
+mkdir -p "$test_tmp/bin"
+cat >"$test_tmp/bin/gh" <<'GH'
+#!/usr/bin/env bash
+printf '%s\n' "$@" >"${DISPATCH_ARGUMENTS}"
+GH
+chmod +x "$test_tmp/bin/gh"
+PATH="$test_tmp/bin:$PATH" DISPATCH_ARGUMENTS="$test_tmp/dispatch-arguments" \
+  GITHUB_REPOSITORY=example/site GITHUB_SHA=old-event-commit GH_TOKEN=fixture-token \
+  bash -euo pipefail -c "$dispatch_command"
+printf '%s\n' workflow run hugo.yaml --repo example/site --ref master >"$test_tmp/expected-arguments"
+cmp --silent "$test_tmp/expected-arguments" "$test_tmp/dispatch-arguments" || fail "a delayed decision must request the current master branch, never its old event revision"
+
+echo "PASS: skip-only checks preserve publications; due checks request current master under complete release concurrency"

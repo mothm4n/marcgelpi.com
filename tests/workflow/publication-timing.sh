@@ -4,7 +4,7 @@ set -euo pipefail
 
 repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 timing_script="$repo_root/scripts/publication-timing.sh"
-workflow="$repo_root/.github/workflows/publication.yaml"
+workflow="$repo_root/.github/workflows/hugo.yaml"
 method="$repo_root/.github/publication-performance.md"
 test_tmp=$(mktemp -d "${TMPDIR:-/tmp}/publication-timing-test.XXXXXX")
 trap 'rm -rf "$test_tmp"' EXIT

@@ -37,6 +37,6 @@ The median warm improvement was **-460.1%**, below the required 10% gain. Accept
 
 ## Hourly publication check
 
-An unchanged scheduled run uses the runner's existing Node runtime and read-only GitHub API calls to compare content eligibility with the last successful Pages deployment. It skips Hugo installation, browser dependencies, acceptance, and deployment. Push and manual runs still execute every release gate.
+An unchanged scheduled run uses the runner's existing Node runtime and read-only GitHub API calls to compare content eligibility with the last successful Pages deployment. It skips Hugo installation, browser dependencies, acceptance, and deployment. Push and manual runs still execute every release gate. The hourly decision runs in a separate concurrency group and dispatches the complete publication workflow on current `master` only when needed. Its job has Actions write permission for that dispatch; it has no Pages or OIDC write permission.
 
 A successful release captures publication state with two counted Hugo list invocations at the canonical artifact's fixed build time. The state contains dates and opaque identifiers, excludes drafts, and is preserved only after Pages deployment succeeds. Timing reports include capture and preservation as separate phases. No build or dependency cache is added. Missing or unusable state takes the full release path. See [the scheduling procedure](../docs/publication-workflow.md#6-schedule-an-approved-article).
