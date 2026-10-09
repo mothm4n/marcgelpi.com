@@ -1,0 +1,13 @@
+{{ with partial "resources/okrs-guide-revision.html" .Page }}
+  {{ $approved := and (not .Draft) (partial "publication-record-approved.html" .Params) }}
+  {{ if not $approved }}
+    <p class="eyebrow" data-publication-review-banner>Draft revision · Pending editorial review</p>
+  {{ end }}
+  {{ .Content }}
+{{ else }}
+  {{ with .Page.Resources.Get "published.md" }}
+    {{ .Content }}
+  {{ else }}
+    {{ errorf "The OKR guide requires its approved published content" }}
+  {{ end }}
+{{ end }}

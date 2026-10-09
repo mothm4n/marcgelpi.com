@@ -45,6 +45,9 @@ async function expectLatestWriting(page, publishedBaseURL = page.url()) {
 
 async function expectEvaluationAfterLayout(page, expression, expected = true) {
   await page.evaluate(async () => {
+    for (const image of document.querySelectorAll('img[loading="lazy"]')) {
+      image.loading = 'eager';
+    }
     await document.fonts.ready;
     await Promise.all(
       Array.from(document.images, (image) => image.decode().catch(() => undefined)),

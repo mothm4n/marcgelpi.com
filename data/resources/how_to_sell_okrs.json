@@ -73,6 +73,191 @@
     "Ambition increased without punitive target management."
   ],
   "pitch": "We do not need OKRs because other companies use them. We need a better way to make a few strategic priorities explicit, connect teams around outcomes and learn earlier when our bets are wrong. I propose a one-cycle pilot in one area, with no link to compensation. We will judge it by whether it improves trade-offs, coordination, learning and ambition - then decide whether to stop, adapt or expand.",
+  "guide_revision": {
+    "outcomes": [
+      {
+        "title": "Choose fewer priorities",
+        "body": "A shared goal can help teams choose which work comes first. Managers must also say which tasks can wait. If every old commitment stays, a new goal adds more work.",
+        "question": "Which work will we postpone to make time for this goal?"
+      },
+      {
+        "title": "Give teams one shared direction",
+        "body": "Teams can use the same goal to discuss what they need from each other. They still need to agree who will do the work and when.",
+        "question": "Where do teams discover too late that they need work from each other?"
+      },
+      {
+        "title": "Review results while there is time to act",
+        "body": "A regular review can show whether the result is improving. When progress slows, the teams can examine the cause and change the plan. People need room to report risks without blame.",
+        "question": "What will we review each week, and which decision could it change?"
+      },
+      {
+        "title": "Test a more ambitious result",
+        "body": "A challenging goal can encourage teams to try a different approach. Agree whether the target is a firm commitment or an ambition to explore. Keep that learning separate from pay and individual performance reviews.",
+        "question": "Which result is worth testing beyond the work we already do?"
+      }
+    ],
+    "observable_costs": [
+      "Teams disagree about which work matters most.",
+      "Teams promise more work than they have time to complete.",
+      "Teams discover too late that they need work from each other.",
+      "Updates list completed tasks without showing whether results improved.",
+      "Managers change priorities without explaining why.",
+      "Urgent daily work leaves no time to test a more ambitious idea."
+    ],
+    "objections": [
+      {
+        "title": "This adds another meeting.",
+        "response": "Replace or simplify an existing meeting or report. Agree which work can wait before adding the test."
+      },
+      {
+        "title": "Our priorities change too often.",
+        "response": "Record why a priority changes and which work must wait. Change the plan when the evidence changes."
+      },
+      {
+        "title": "People will try to make the numbers look good.",
+        "response": "Review customer results alongside team feedback and actual decisions. Keep the test separate from pay and individual performance reviews."
+      },
+      {
+        "title": "We already have measures.",
+        "response": "Keep the key performance indicators (KPIs) you use to track daily work. Use OKRs for the few results that need change now."
+      }
+    ],
+    "source": {
+      "attribution": "What Matters",
+      "url": "https://www.whatmatters.com/faqs/okr-meaning-definition-example",
+      "link_label": "explanation of Objectives and Key Results",
+      "guardrail": "Use these benefits to assess the problem. They do not show that OKRs are the right choice for every organization."
+    }
+  },
+  "pilot_proposal": {
+    "example_heading": "Example: a three-month OKR cycle for two teams",
+    "example_intro": "This fictional example asks a manager to approve one three-month OKR cycle for two teams. They aim to reduce delays when new customers start using the service. An early review examines decisions and obstacles. The final review examines customer delays and learning. The example uses invented names, dates, observations and decision criteria.",
+    "fields": [
+      {
+        "label": "The problem",
+        "example": [
+          "One team helps new customers start using the service. The other team manages their accounts.",
+          "In December 2026, 4 of 20 new customers missed their agreed start date because one team needed unfinished work from the other. All 20 were due to start that month.",
+          "In two cases, a team started a task before identifying the work it needed from the other team.",
+          "Both teams also accepted new requests. Nobody agreed which existing tasks could wait."
+        ],
+        "prompt": "[The problem, an example you can show and its cost.]"
+      },
+      {
+        "label": "The shared goal",
+        "example": [
+          "Objective: reduce avoidable delays when new customers start using the service.",
+          "Measure customers whose agreed start date falls between 1 January and 31 March 2027. Count each customer once.",
+          "Measure the share who miss their agreed date because work from either team is missing. Include customers who are still waiting after that date.",
+          "Key result: reduce that share from 20% to 10% or less by 31 March 2027.",
+          "Both teams use this goal to choose which work comes first. Leaders explain which tasks can wait, so people know what they can stop doing."
+        ],
+        "prompt": "[The shared objective, the measure, the starting figure, the target and the deadline.]"
+      },
+      {
+        "label": "The scope",
+        "example": [
+          "The cycle covers two teams and one part of the service: helping new customers start using it.",
+          "Keep the measures we already use to track finances and daily work. Any wider use needs a separate decision."
+        ],
+        "prompt": "[The part of the service, the teams and what stays outside the test.]"
+      },
+      {
+        "label": "Who runs the test",
+        "example": [
+          "Ana, product lead, organizes the test and records decisions. Luis, area director, decides which tasks can wait when priorities conflict."
+        ],
+        "prompt": "[Who organizes the test and which manager can decide what work comes first.]"
+      },
+      {
+        "label": "The dates",
+        "example": [
+          "Run the cycle from 1 January to 31 March 2027.",
+          "On 29 January, review how the teams work and adjust their approach. Review results and decide the next step on 1 April, after the last measured day."
+        ],
+        "prompt": "[Cycle start and end dates, an early review of how teams work, and a final review after the last measured day.]"
+      },
+      {
+        "label": "The weekly meeting",
+        "example": [
+          "Both teams meet for 20 minutes each week. They bring results, risks and decisions they need. Ana records each decision and who must act."
+        ],
+        "prompt": "[Who meets, how often, for how long and who records decisions.]"
+      },
+      {
+        "label": "What this replaces",
+        "example": [
+          "Use this meeting instead of the current weekly status meeting. Keep regular team planning. Keep the cycle separate from pay and individual performance reviews."
+        ],
+        "prompt": "[The meeting or report this replaces, and how you keep the test separate from individual performance reviews.]"
+      },
+      {
+        "label": "What we will check",
+        "example": [
+          "Before the cycle, Luis and the teams agree what customer data and recorded decisions they need for a useful review.",
+          "Ana records current tasks, known needs between the teams and the starting customer figures.",
+          "Each week, Ana counts customers whose agreed start date falls in that week. Count each customer once.",
+          "Record delays caused by missing work from either team, including customers still waiting after that date. Ana adds the weekly counts for the final review.",
+          "Ana also records decisions, when teams report work they need from each other, and time spent in meetings.",
+          "On 29 January, check whether the teams understand the shared goal and report needs early. Review priority decisions and meeting effort. Adjust the work without requiring the final result.",
+          "On 1 April, compare the delay rate with the 20% starting figure and the 10% target. Report the customer counts too.",
+          "If no customers were due to start, report that there is no customer evidence. Do not report a 0% delay rate.",
+          "Both teams say whether the weekly meeting helped a decision. Luis and the teams use these questions to discuss usefulness. The answers do not automatically decide whether to continue."
+        ],
+        "checks": [
+          "Did we record at least two decisions about which work to do first and which work could wait?",
+          "Can both teams explain the shared goal?",
+          "Did we identify a need for work from the other team before starting the task that needed that work?"
+        ],
+        "prompt": "[Starting figures, weekly customer counts, decisions and meeting effort. State what each review will check and what evidence you need to decide.]"
+      },
+      {
+        "label": "When we will continue, adapt or stop",
+        "example": [
+          "At the final review, Luis and the teams assess customer results, decisions and learning.",
+          "Stop if the cycle provides no observable value. Also stop if managers refuse to make time or use the cycle to judge individual performance.",
+          "Continue for another limited cycle when decisions and coordination improve and meeting time is manageable. Use customer results to agree the next action.",
+          "Progress and useful learning can justify another cycle even if the teams miss the target.",
+          "Adapt the next cycle if it helps, but coordination problems remain or meetings take too much time. Change the approach when customer results call for it.",
+          "If there is too little evidence, record what remains unknown. Agree whether another limited cycle could provide useful evidence.",
+          "A better result alone does not prove that OKRs caused it. Note other changes that could explain the result."
+        ],
+        "prompt": "[When you will continue, adapt or stop the test. Include what you will do if there is too little evidence.]"
+      },
+      {
+        "label": "Permission we need",
+        "example": [
+          "Approve the three-month cycle and Ana and Luis in their roles.",
+          "Let the teams postpone less important work within the agreed area.",
+          "Reserve time for weekly meetings, the early review on 29 January and the final review on 1 April 2027.",
+          "Decide the next step after reviewing results and learning."
+        ],
+        "prompt": "[What the manager must approve, what the teams can postpone and who makes the final decision.]"
+      }
+    ],
+    "brief_heading": "Copy this test proposal",
+    "brief_intro": "Select the text below and paste it into your proposal. Replace the brackets with facts from your organization. Agree when to continue, adapt or stop with the manager before the cycle starts.",
+    "limits_heading": "Check whether a test makes sense",
+    "limits_intro": "Before the test, agree which problem matters and who can decide what work comes first. Give the teams time to act on what they learn:",
+    "limits": [
+      "If leaders disagree about which problem to solve, decide that first. Goals cannot choose a direction for them.",
+      "If nobody can set priorities or decide who owns the work, name a manager who can. Otherwise the teams cannot resolve conflicts.",
+      "If managers will not let any task wait, agree what work to simplify before adding the test. Another meeting creates no extra time.",
+      "If leaders plan to judge individual performance or pay through the test, agree to keep those decisions separate. People need room to report risks and wrong assumptions."
+    ],
+    "case_link": {
+      "intro": "For related experience with executive OKR coaching and quarterly alignment across teams, read",
+      "label": "the Adevinta case on scaling OKR practice",
+      "href": "/work/adevinta/"
+    },
+    "contact_heading": "Bring the organizational problem",
+    "contact_intro": "If teams struggle to choose priorities or coordinate their work,",
+    "contact_link": {
+      "label": "tell me what is happening in your organization",
+      "href": "/contact/"
+    },
+    "contact_followup": "We can discuss the problem and whether a small test could help."
+  },
   "source": {
     "title": "Five Benefits of OKRs",
     "url": "https://www.whatmatters.com/okrs-explained/benefits-of-okrs/",

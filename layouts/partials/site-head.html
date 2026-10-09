@@ -8,6 +8,7 @@
 {{ $searchTitle := $pageTitle }}
 {{ if and .IsHome .Params.seo_title }}{{ $searchTitle = .Params.seo_title }}{{ end }}
 {{ $pageDescription := .Description | default site.Params.description }}
+{{ with partial "resources/okrs-guide-revision.html" . }}{{ $pageDescription = .Description }}{{ end }}
 {{ if eq .Kind "404" }}{{ $pageDescription = printf "The requested page could not be found on %s’s site." site.Params.author.name }}{{ end }}
 {{ $searchDescription := $pageDescription }}
 {{ with .Params.seo_description }}{{ $searchDescription = . }}{{ end }}

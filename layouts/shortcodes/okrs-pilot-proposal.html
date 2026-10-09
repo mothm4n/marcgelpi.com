@@ -1,0 +1,47 @@
+{{ $section := .Get 0 }}
+{{ with hugo.Data.resources.how_to_sell_okrs.pilot_proposal }}
+  {{ if eq $section "example" }}
+    <section aria-labelledby="okr-pilot-example-title">
+      <h2 id="okr-pilot-example-title">{{ .example_heading }}</h2>
+      <p>{{ .example_intro }}</p>
+      <dl class="okr-pilot-example">
+        {{ range .fields }}
+          <div>
+            <dt>{{ .label }}</dt>
+            <dd>
+              {{ range .example }}<p>{{ . }}</p>{{ end }}
+              {{ with .checks }}
+                <ul>{{ range . }}<li>{{ . }}</li>{{ end }}</ul>
+              {{ end }}
+            </dd>
+          </div>
+        {{ end }}
+      </dl>
+    </section>
+  {{ else if eq $section "brief" }}
+    <section aria-labelledby="okr-pilot-brief-title">
+      <h2 id="okr-pilot-brief-title">{{ .brief_heading }}</h2>
+      <p>{{ .brief_intro }}</p>
+      <div class="okr-pilot-brief">
+        {{ range .fields }}
+          <p><strong>{{ .label }}</strong><br>{{ .prompt }}</p>
+        {{ end }}
+      </div>
+    </section>
+  {{ else if eq $section "limits" }}
+    <section aria-labelledby="okr-pilot-limits-title">
+      <h2 id="okr-pilot-limits-title">{{ .limits_heading }}</h2>
+      <p>{{ .limits_intro }}</p>
+      <ul>{{ range .limits }}<li>{{ . }}</li>{{ end }}</ul>
+    </section>
+  {{ else if eq $section "experience" }}
+    <p>{{ .case_link.intro }} <a href="{{ .case_link.href }}">{{ .case_link.label }}</a>.</p>
+  {{ else if eq $section "contact" }}
+    <section aria-labelledby="okr-pilot-contact-title">
+      <h2 id="okr-pilot-contact-title">{{ .contact_heading }}</h2>
+      <p>{{ .contact_intro }} <a href="{{ .contact_link.href }}">{{ .contact_link.label }}</a>. {{ .contact_followup }}</p>
+    </section>
+  {{ else }}
+    {{ errorf "Unknown OKR proposal section %q" $section }}
+  {{ end }}
+{{ end }}

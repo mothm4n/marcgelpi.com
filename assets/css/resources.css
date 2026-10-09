@@ -208,13 +208,42 @@
   font: inherit;
 }
 
+.okr-pilot-example {
+  margin: 2rem 0;
+}
+
+.okr-pilot-example > div {
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.okr-pilot-example dt {
+  color: var(--petrol);
+  font-weight: 600;
+}
+
+.okr-pilot-example dd {
+  margin: 0;
+}
+
+.okr-pilot-example dd p {
+  margin: 0.5rem 0 0;
+}
+
+.okr-pilot-brief {
+  padding: 0.5rem 1.5rem;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-left: 0.3rem solid var(--copper);
+}
+
 .resource-article-body img {
   --resource-image-overhang: min(14rem, 20vw);
 
-  width: calc(100% + (2 * var(--resource-image-overhang)));
+  width: min(calc(100% + (2 * var(--resource-image-overhang))), calc(100vw - (2 * var(--page-gutter))));
   max-width: none;
   height: auto;
-  margin: clamp(3rem, 7vw, 6rem) calc(-1 * var(--resource-image-overhang));
+  margin: clamp(3rem, 7vw, 6rem) max(calc(-1 * var(--resource-image-overhang)), calc((100% - 100vw) / 2 + var(--page-gutter)));
 }
 
 .resource-final-cta {

@@ -1,0 +1,5 @@
+{{ $data := hugo.Data.resources.how_to_sell_okrs }}
+{{ with .Params.resource_data }}
+  {{ $data = index $data . }}
+{{ end }}
+{{ return $data }}

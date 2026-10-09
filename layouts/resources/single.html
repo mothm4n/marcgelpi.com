@@ -1,13 +1,23 @@
 {{ define "main" }}
   {{ $download := resources.Get .Params.download_asset }}
   {{ $hero := resources.Get .Params.hero_asset }}
+  {{ $revision := partial "resources/okrs-guide-revision.html" . }}
+  {{ $deck := .Description }}
+  {{ $audience := .Params.audience }}
+  {{ with $revision }}
+    {{ $deck = .Description }}
+    {{ with .Params.audience }}{{ $audience = . }}{{ end }}
+    {{ with .Params.download_asset }}
+      {{ $download = resources.Get . | resources.Copy $.Params.download_asset }}
+    {{ end }}
+  {{ end }}
   <article class="resource-article">
     <header class="resource-hero">
       <div class="resource-hero-copy">
         <p class="eyebrow">{{ .Params.resource_label }}</p>
         <h1>{{ .Title }}</h1>
-        <p class="resource-deck">{{ .Description }}</p>
-        <p class="resource-meta">{{ .Params.duration_minutes }}-minute guide · {{ .Params.audience }}</p>
+        <p class="resource-deck">{{ $deck }}</p>
+        <p class="resource-meta">{{ .Params.duration_minutes }}-minute guide · {{ $audience }}</p>
         {{ with $download }}
           <a class="resource-download" href="{{ .RelPermalink }}" download>
             Download the field guide <span aria-hidden="true">↓</span>
@@ -33,8 +43,13 @@
 
     <footer class="resource-final-cta">
       <p class="eyebrow">Take it into the room</p>
-      <h2>Make the case without overselling it.</h2>
-      <p>Use the field guide to prepare the problem, the outcomes, the objections and a small pilot request.</p>
+      {{ if $revision }}
+        <h2>Take your proposal to the meeting.</h2>
+        <p>Use the field guide to prepare the problem, your proposal and your manager’s questions.</p>
+      {{ else }}
+        <h2>Make the case without overselling it.</h2>
+        <p>Use the field guide to prepare the problem, the outcomes, the objections and a small pilot request.</p>
+      {{ end }}
       {{ with $download }}
         <a class="resource-download" href="{{ .RelPermalink }}" download>
           Download the PDF <span aria-hidden="true">↓</span>

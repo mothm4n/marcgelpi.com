@@ -6,10 +6,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import shutil
 import subprocess
 import tempfile
 from pathlib import Path
+from urllib.parse import urljoin
 
 from docx import Document
 from docx.enum.style import WD_STYLE_TYPE
@@ -17,6 +19,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Cm, Inches, Pt, RGBColor
+from lxml import html
 
 
 CHARCOAL = "252522"
@@ -209,19 +212,23 @@ def configure_document(document: Document) -> None:
     add_page_number(footer)
 
 
-def add_cover(document: Document, hero_path: Path) -> None:
+def add_cover(
+    document: Document,
+    hero_path: Path,
+    title: str = "How to sell OKRs internally",
+    description: str = "Build the case for focus, alignment, accountability and ambitious learning - without selling OKRs as a cure-all.",
+    image_width: float = 7.0,
+) -> None:
     add_image(
         document,
         hero_path,
-        7.0,
+        image_width,
         "Abstract petrol, charcoal and copper forms converging around a precise area of negative space.",
     )
     add_label(document, "Field guide  /  15 minutes")
-    document.add_paragraph("How to sell OKRs internally", style="Title")
+    document.add_paragraph(title, style="Title")
     paragraph = document.add_paragraph()
-    run = paragraph.add_run(
-        "Build the case for focus, alignment, accountability and ambitious learning - without selling OKRs as a cure-all."
-    )
+    run = paragraph.add_run(description)
     run.font.name = "Georgia"
     run.font.size = Pt(16)
     document.add_paragraph("Marc Gelpi  -  marcgelpi.com")
@@ -340,6 +347,110 @@ def build_document(resource: dict, hero_path: Path, destination: Path) -> None:
     document.save(destination)
 
 
+def add_html_inline(paragraph, element, bold: bool = False, italic: bool = False) -> None:
+    def add_text(value: str | None) -> None:
+        if value:
+            run = paragraph.add_run(re.sub(r"\s+", " ", value))
+            run.bold = bold
+            run.italic = italic
+
+    add_text(element.text)
+    for child in element:
+        if child.tag == "br":
+            paragraph.add_run().add_break()
+        elif child.tag == "a":
+            add_hyperlink(
+                paragraph,
+                re.sub(r"\s+", " ", child.text_content()),
+                urljoin("https://marcgelpi.com/", child.get("href", "")),
+            )
+        else:
+            add_html_inline(
+                paragraph,
+                child,
+                bold or child.tag in {"strong", "b"},
+                italic or child.tag in {"em", "i"},
+            )
+        add_text(child.tail)
+
+
+def add_html_blocks(document: Document, element) -> None:
+    for child in element:
+        if child.tag in {"h2", "h3", "dt"}:
+            level = 1 if child.tag == "h2" else 2
+            heading = document.add_heading(child.text_content().strip(), level=level)
+            heading.paragraph_format.keep_with_next = True
+            if child.get("id") in {"okr-pilot-example-title", "okr-pilot-brief-title"}:
+                heading.paragraph_format.page_break_before = True
+        elif child.tag in {"p", "li"}:
+            if not child.text_content().strip():
+                continue
+            # Keep each proposal label or objection with its explanation.
+            if (
+                child.tag == "p"
+                and not (child.text or "").strip()
+                and len(child) >= 2
+                and child[0].tag == "strong"
+                and child[1].tag == "br"
+            ):
+                label = document.add_heading(child[0].text_content().strip(), level=2)
+                label.paragraph_format.keep_with_next = True
+                child.text = child[1].tail
+                child.remove(child[0])
+                child.remove(child[0])
+            paragraph = document.add_paragraph(style="List Bullet" if child.tag == "li" else "Normal")
+            paragraph.paragraph_format.widow_control = True
+            add_html_inline(paragraph, child)
+        else:
+            add_html_blocks(document, child)
+        if child.tag == "dd" and len(child.text_content().split()) <= 100:
+            # Keep short example fields together without binding long fields to one page.
+            paragraphs = document.paragraphs
+            field_paragraphs = len(child.xpath(".//p"))
+            for paragraph in paragraphs[-field_paragraphs:-1]:
+                paragraph.paragraph_format.keep_with_next = True
+
+
+def build_document_from_html(source_html: Path, hero_path: Path, destination: Path) -> None:
+    page = html.parse(str(source_html))
+    articles = page.xpath("//article[contains(concat(' ', normalize-space(@class), ' '), ' resource-article ')]")
+    if len(articles) != 1:
+        raise ValueError("Source HTML must contain one resource article")
+    article = articles[0]
+    title = article.findtext(".//h1", "").strip()
+    descriptions = article.xpath(".//p[contains(concat(' ', normalize-space(@class), ' '), ' resource-deck ')]")
+    bodies = article.xpath(".//div[contains(concat(' ', normalize-space(@class), ' '), ' resource-article-body ')]")
+    if not title or len(descriptions) != 1 or len(bodies) != 1:
+        raise ValueError("Source HTML must contain a title, description and editorial body")
+    description = descriptions[0].text_content().strip()
+    body = bodies[0]
+    for control in body.xpath(
+        ".//*[@data-publication-review-banner] | .//a[@aria-label='Anchor'] | .//a[@download]"
+        " | .//button | .//figure | .//nav | .//script | .//style"
+    ):
+        control.drop_tree()
+    if not description or not body.text_content().strip():
+        raise ValueError("Source HTML must contain editorial text")
+
+    document = Document()
+    configure_document(document)
+    document.styles["Normal"].paragraph_format.space_after = Pt(4)
+    document.styles["Normal"].paragraph_format.line_spacing = 1.05
+    document.styles["Heading 1"].font.size = Pt(21)
+    document.styles["Heading 1"].paragraph_format.space_before = Pt(9)
+    document.styles["Heading 1"].paragraph_format.space_after = Pt(7)
+    document.styles["Heading 2"].paragraph_format.space_before = Pt(10)
+    document.styles["Heading 2"].paragraph_format.space_after = Pt(3)
+    document.core_properties.title = title
+    document.core_properties.author = "Marc Gelpi"
+    document.core_properties.subject = description
+    document.core_properties.keywords = "OKRs, leadership, alignment, focus, accountability, change"
+    document.core_properties.language = "en-US"
+    add_cover(document, hero_path, title, description, image_width=6.8)
+    add_html_blocks(document, body)
+    document.save(destination)
+
+
 def export_tagged_pdf(source: Path, output: Path) -> None:
     soffice = shutil.which("soffice")
     if not soffice:
@@ -373,14 +484,19 @@ def export_tagged_pdf(source: Path, output: Path) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("output", nargs="?", default="output/pdf/how-to-sell-okrs.pdf")
+    parser.add_argument("--source-html", type=Path, help="Export the editorial article from a clean Hugo development build")
     args = parser.parse_args()
     repo_root = Path(__file__).resolve().parent.parent
-    resource = json.loads((repo_root / "data/resources/how_to_sell_okrs.json").read_text())
     temporary_root = repo_root / "tmp/pdfs"
     temporary_root.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="okrs-resource-", dir=temporary_root) as temporary_directory:
         source = Path(temporary_directory) / "how-to-sell-okrs.docx"
-        build_document(resource, repo_root / "assets/images/resources/okrs-focus-abstract.png", source)
+        hero_path = repo_root / "assets/images/resources/okrs-focus-abstract.png"
+        if args.source_html:
+            build_document_from_html(args.source_html, hero_path, source)
+        else:
+            resource = json.loads((repo_root / "data/resources/how_to_sell_okrs.json").read_text())
+            build_document(resource, hero_path, source)
         export_tagged_pdf(source, repo_root / args.output)
 
 

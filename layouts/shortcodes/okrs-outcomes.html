@@ -1,4 +1,4 @@
-{{ $resource := hugo.Data.resources.how_to_sell_okrs }}
+{{ $resource := partial "resources/okrs-guide-data.html" .Page }}
 {{ range $resource.outcomes }}
   <h3>{{ .title }}</h3>
   <p>{{ .body }}</p>

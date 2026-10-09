@@ -50,7 +50,10 @@ function publicationRecordIsApproved(yaml, record) {
   const start = lines.findIndex((line) => line === `${record}:`);
   if (start < 0) return false;
   const values = {};
-  let inPublication = false;
+  let inPublication = record === 'publication';
+  const valuePattern = record === 'publication'
+    ? /^  ([a-z_]+):\s*["']?(.*?)["']?\s*$/
+    : /^    ([a-z_]+):\s*["']?(.*?)["']?\s*$/;
   for (const line of lines.slice(start + 1)) {
     if (/^\S/.test(line)) break;
     if (line === '  publication:') {
@@ -58,7 +61,7 @@ function publicationRecordIsApproved(yaml, record) {
       continue;
     }
     if (!inPublication) continue;
-    const match = line.match(/^    ([a-z_]+):\s*["']?(.*?)["']?\s*$/);
+    const match = line.match(valuePattern);
     if (match) values[match[1]] = match[2];
   }
   return values.status === 'approved'
@@ -343,7 +346,7 @@ test('Resources journey', async ({
   await page.setViewportSize({ width: 390, height: 844 });
   await expectEvaluation(page, headingAndOverflowExpression);
   await page.goto('/resources/how-to-sell-okrs/');
-  await expectEvaluation(page, String.raw`(() => { const main = document.querySelector('main'); const images = Array.from(main?.querySelectorAll('img') ?? []); const headings = Array.from(main?.querySelectorAll('h2') ?? []).map(heading => heading.firstChild?.textContent.trim()); const copy = main?.textContent ?? ''; return main?.querySelector('h1')?.textContent.trim() === 'How to sell OKRs internally' && main?.querySelector('.resource-deck')?.textContent.trim() === 'A practical case for focus, alignment, accountability and ambitious learning — without selling OKRs as a cure-all.' && headings.includes('Do not sell the framework') && headings.includes('Lead with four outcomes') && headings.includes('Make a smaller ask') && ['Focus and commitment', 'Alignment and connection', 'Tracking and accountability', 'Stretch and learning'].every(outcome => copy.includes(outcome)) && images.length === 2 && images.every(image => image.alt.trim().length > 0); })()`);
+  await expectEvaluation(page, String.raw`(() => { const main = document.querySelector('main'); const images = Array.from(main?.querySelectorAll('img') ?? []); const headings = Array.from(main?.querySelectorAll('h2') ?? []).map(heading => heading.firstChild?.textContent.trim()); const copy = main?.textContent ?? ''; return main?.querySelector('h1')?.textContent.trim() === 'How to sell OKRs internally' && main?.querySelector('.resource-deck')?.textContent.trim() === 'Prepare a first OKR cycle your manager can approve, with a worked example and a proposal you can copy.' && headings.includes('Start with a problem your manager can see') && headings.includes('Explain what OKRs mean') && headings.includes('Ask for one OKR cycle') && ['Choose fewer priorities', 'Give teams one shared direction', 'Review results while there is time to act', 'Test a more ambitious result'].every(outcome => copy.includes(outcome)) && images.length === 2 && images.every(image => image.alt.trim().length > 0); })()`);
   await expectEvaluation(page, String.raw`(async () => { const links = Array.from(document.querySelectorAll('main a[download][href="/downloads/how-to-sell-okrs.pdf"]')); const response = await fetch('/downloads/how-to-sell-okrs.pdf'); const bytes = new Uint8Array(await response.arrayBuffer()); const signature = String.fromCharCode(...bytes.slice(0, 5)); const structure = new TextDecoder('latin1').decode(bytes); return links.length === 2 && links[0]?.textContent.includes('Download the field guide') && response.ok && response.headers.get('content-type') === 'application/pdf' && signature === '%PDF-' && structure.includes('/StructTreeRoot') && /\/Marked\s+true/.test(structure) && structure.includes('/Lang(en-US)'); })()`);
 
   const fixture = await createContentFixture();
@@ -378,6 +381,114 @@ test('Resources journey', async ({
   await expectEvaluation(page, headingAndOverflowExpression);
   await page.setViewportSize({ width: 390, height: 844 });
   await expectEvaluation(page, headingAndOverflowExpression);
+});
+
+test('OKR pilot proposal review journey', async ({ page, canonicalArtifacts, createContentFixture, createIsolatedArtifact }) => {
+  const exampleHeading = 'Example: a three-month OKR cycle for two teams';
+  const briefHeading = 'Copy this test proposal';
+  const revisionPath = 'resources/how-to-sell-okrs/review.md';
+  const revision = await fs.readFile(path.join(repoRoot, 'content', revisionPath), 'utf8');
+  const approved = /^draft: false$/m.test(revision) && publicationRecordIsApproved(revision, 'publication');
+  const publishedPDF = await fs.readFile(path.join(repoRoot, 'assets/downloads/how-to-sell-okrs.pdf'));
+  const reviewPDF = await fs.readFile(path.join(repoRoot, 'assets/downloads/how-to-sell-okrs-review.pdf'));
+  const expectDownloadEdition = async (expectedPDF) => {
+    const downloads = page.locator('main a[download]');
+    await expect(downloads).toHaveCount(2);
+    for (const download of await downloads.all()) {
+      await expect(download).toHaveAttribute('href', '/downloads/how-to-sell-okrs.pdf');
+      const url = new URL(await download.getAttribute('href'), page.url()).href;
+      const response = await page.request.get(url);
+      expect(response.ok()).toBe(true);
+      expect((await response.body()).equals(expectedPDF)).toBe(true);
+    }
+    const hiddenAsset = await page.request.get(new URL('/downloads/how-to-sell-okrs-review.pdf', page.url()).href);
+    expect(hiddenAsset.status()).toBe(404);
+  };
+  expect(reviewPDF.equals(publishedPDF)).toBe(false);
+  expect(reviewPDF.toString('latin1')).toContain('/StructTreeRoot');
+  expect(reviewPDF.toString('latin1')).toMatch(/\/Marked\s+true/);
+
+  await page.goto('/resources/how-to-sell-okrs/');
+  await expectDownloadEdition(approved ? reviewPDF : publishedPDF);
+  await expect(page.getByRole('heading', { name: exampleHeading })).toHaveCount(approved ? 1 : 0);
+  await expect(page.getByRole('heading', { name: briefHeading })).toHaveCount(approved ? 1 : 0);
+  expect(await directoryContains(canonicalArtifacts.productionDirectory, exampleHeading)).toBe(approved);
+  expect(await directoryContains(canonicalArtifacts.productionDirectory, 'Ana, product lead')).toBe(approved);
+  expect(await directoryContains(canonicalArtifacts.productionDirectory, 'OKR means Objectives and Key Results.')).toBe(approved);
+
+  await page.goto(`${previewBaseURL}/resources/how-to-sell-okrs/`);
+  const example = page.getByRole('region', { name: exampleHeading });
+  const brief = page.getByRole('region', { name: briefHeading });
+  await expect(example).toBeVisible();
+  await expect(example).toContainText('fictional example');
+  await expect(example).toContainText('Ana, product lead');
+  await expect(page.getByRole('heading', { name: 'Explain what OKRs mean' })).toBeVisible();
+  await expect(example).toContainText('4 of 20');
+  await expect(example).toContainText('10%');
+  await expect(example).toContainText('1 January to 31 March 2027');
+  await expect(example).toContainText('29 January');
+  await expect(example).toContainText('1 April');
+  await expect(example).toContainText('Count each customer once');
+  await expect(example).toContainText('Do not report a 0% delay rate');
+  await expect(example).toContainText('even if the teams miss the target');
+  await expect(page.locator('.resource-article-body')).not.toContainText(/six[- ]week|customer onboarding/i);
+  await expectDownloadEdition(reviewPDF);
+
+  const exampleFields = await example.locator('dt').allTextContents();
+  const briefFields = await brief.locator('strong').allTextContents();
+  expect(exampleFields).toHaveLength(10);
+  expect(briefFields).toEqual(exampleFields);
+  expect(exampleFields[8]).toBe('When we will continue, adapt or stop');
+  await expect(example.locator('dd')).toHaveCount(10);
+  await expect(brief.locator('form, input, textarea')).toHaveCount(0);
+  await expect(brief).toContainText('[');
+  await expect(page.getByRole('heading', { name: 'Check whether a test makes sense' })).toBeVisible();
+  await expect(page.locator('.resource-article-body a[href="/work/adevinta/"]')).toHaveCount(1);
+  await expect(page.locator('.resource-article-body a[href="/contact/"]')).toHaveCount(1);
+
+  await expectEvaluation(page, String.raw`(() => { const headings = Array.from(document.querySelectorAll('main h2')).map(heading => heading.innerText.trim()); const order = ['Start with a problem your manager can see', 'Explain what OKRs mean', 'Check whether a test makes sense', 'Ask for one OKR cycle', 'Example: a three-month OKR cycle for two teams', 'Explain how the work could improve', 'Answer your manager’s questions', 'Copy this test proposal', 'Experience and further reading', 'Bring the organizational problem'].map(heading => headings.indexOf(heading)); return order.every((position, index) => position >= 0 && (index === 0 || position > order[index - 1])); })()`);
+  await expectEvaluation(page, String.raw`(() => { const brief = document.querySelector('[aria-labelledby="okr-pilot-brief-title"]'); const range = document.createRange(); range.selectNodeContents(brief); const selection = window.getSelection(); selection.removeAllRanges(); selection.addRange(range); const selected = selection.toString(); selection.removeAllRanges(); return getComputedStyle(brief).userSelect !== 'none' && selected.includes('The problem') && selected.includes('Permission we need') && selected.includes('['); })()`);
+
+  await page.locator('.resource-article-body img').scrollIntoViewIfNeeded();
+  for (const viewport of [{ width: 390, height: 844 }, { width: 860, height: 900 }, { width: 1440, height: 1000 }]) {
+    await page.setViewportSize(viewport);
+    await expectEvaluationAfterLayout(page, headingAndOverflowExpression);
+    await expectAxeClean(page);
+  }
+
+  const fixture = await createContentFixture();
+  const fixtureRevision = path.join(fixture.directory, revisionPath);
+  const pendingRevision = revision
+    .replace(/^draft:.*$/m, 'draft: true')
+    .replace(/^  status:.*$/m, '  status: "review"')
+    .replace(/^  reviewed_by:.*$/m, '  reviewed_by: ""')
+    .replace(/^  reviewed_at:.*$/m, '  reviewed_at: ""')
+    .replace(/^  privacy_reviewed:.*$/m, '  privacy_reviewed: false');
+  await fs.writeFile(fixtureRevision, pendingRevision);
+  const pendingArtifact = await createIsolatedArtifact({ contentDirectory: fixture.directory });
+  await page.goto(`${pendingArtifact.url}/resources/how-to-sell-okrs/`);
+  await expect(page.getByRole('heading', { name: 'Do not sell the framework' })).toBeVisible();
+  await expectDownloadEdition(publishedPDF);
+
+  const incompleteApproval = pendingRevision.replace('draft: true', 'draft: false').replace('status: "review"', 'status: "approved"');
+  await fs.writeFile(fixtureRevision, incompleteApproval);
+  const unapprovedArtifact = await createIsolatedArtifact({ contentDirectory: fixture.directory });
+  expect(await directoryContains(unapprovedArtifact.directory, 'OKR means Objectives and Key Results.')).toBe(false);
+  await page.goto(`${unapprovedArtifact.url}/resources/how-to-sell-okrs/`);
+  await expect(page.getByRole('heading', { name: 'Do not sell the framework' })).toBeVisible();
+  await expectDownloadEdition(publishedPDF);
+
+  await fs.writeFile(fixtureRevision, incompleteApproval
+    .replace('reviewed_by: ""', 'reviewed_by: "Local acceptance fixture"')
+    .replace('reviewed_at: ""', 'reviewed_at: "2026-10-09"')
+    .replace('privacy_reviewed: false', 'privacy_reviewed: true'));
+  const approvedArtifact = await createIsolatedArtifact({ contentDirectory: fixture.directory });
+  await page.goto(`${approvedArtifact.url}/resources/how-to-sell-okrs/`);
+  await expect(page.getByRole('heading', { name: 'Explain what OKRs mean' })).toBeVisible();
+  await expect(page.getByRole('region', { name: exampleHeading })).toBeVisible();
+  await expect(page.locator('[data-publication-review-banner]')).toHaveCount(0);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('How to sell OKRs internally');
+  await expectDownloadEdition(reviewPDF);
 });
 
 test('SEO backlog release journey', async ({ page, canonicalArtifacts }) => {
@@ -421,7 +532,7 @@ test('SEO backlog release journey', async ({ page, canonicalArtifacts }) => {
   await expectEvaluation(page, String.raw`(() => { const links = Array.from(document.querySelectorAll('main ol a')); return links.length === 1 && links[0]?.getAttribute('href') === '/resources/how-to-sell-okrs/' && links[0]?.querySelector('strong')?.textContent.trim() === 'How to sell OKRs internally' && links[0]?.textContent.includes('Field guide · PDF'); })()`);
   await expectHeadingLinksAndOverflow(page);
   await page.goto('/resources/how-to-sell-okrs/');
-  await expectEvaluation(page, String.raw`(() => { const main = document.querySelector('main'); const images = Array.from(main?.querySelectorAll('img') ?? []).map(image => new URL(image.src).pathname).sort(); const downloads = Array.from(main?.querySelectorAll('a[download]') ?? []).map(link => link.getAttribute('href')); return main?.querySelector('h1')?.textContent.trim() === 'How to sell OKRs internally' && main?.querySelector('.resource-deck')?.textContent.trim() === 'A practical case for focus, alignment, accountability and ambitious learning — without selling OKRs as a cure-all.' && images.join('|') === '/images/resources/okrs-focus-abstract.png|/images/resources/okrs-four-outcomes.svg' && downloads.length === 2 && downloads.every(href => href === '/downloads/how-to-sell-okrs.pdf'); })()`);
+  await expectEvaluation(page, String.raw`(() => { const main = document.querySelector('main'); const images = Array.from(main?.querySelectorAll('img') ?? []).map(image => new URL(image.src).pathname).sort(); const downloads = Array.from(main?.querySelectorAll('a[download]') ?? []).map(link => link.getAttribute('href')); return main?.querySelector('h1')?.textContent.trim() === 'How to sell OKRs internally' && main?.querySelector('.resource-deck')?.textContent.trim() === 'Prepare a first OKR cycle your manager can approve, with a worked example and a proposal you can copy.' && images.join('|') === '/images/resources/okrs-focus-abstract.png|/images/resources/okrs-four-outcomes.svg' && downloads.length === 2 && downloads.every(href => href === '/downloads/how-to-sell-okrs.pdf'); })()`);
   for (const casePath of ['/work/adevinta/', '/work/protected-autonomy/', '/work/preparing-to-scale/']) {
     await page.goto(casePath);
     for (const viewport of [{ width: 1440, height: 1000 }, { width: 390, height: 844 }]) {
