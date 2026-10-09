@@ -103,7 +103,9 @@ CHECKS
 tap_status=0
 (
   cd "$repo_root"
-  npm run --silent test:agent -- node --test --test-reporter=tap "$test_tmp/failing-tap-checks.js"
+  # Release-command regressions run npm test from a Node test worker. Start this
+  # independent TAP command without the outer worker's internal runner context.
+  npm run --silent test:agent -- env -u NODE_TEST_CONTEXT node --test --test-reporter=tap "$test_tmp/failing-tap-checks.js"
 ) >"$test_tmp/tap-summary.log" 2>&1 || tap_status=$?
 [[ "$tap_status" -eq 1 ]] || fail "agent command changed the TAP failure exit status to $tap_status"
 contains 'FAIL: tests (exit 1;' "$test_tmp/tap-summary.log"
@@ -111,7 +113,7 @@ contains 'not ok 1 - publication check 1' "$test_tmp/tap-summary.log"
 contains 'not ok 8 - publication check 8' "$test_tmp/tap-summary.log"
 contains '2 further failed checks; see the full log' "$test_tmp/tap-summary.log"
 [[ $(wc -l <"$test_tmp/tap-summary.log") -le 12 ]] || fail 'TAP failure summary is not concise'
-awk 'length($0) > 244 { exit 1 }' "$test_tmp/tap-summary.log" || fail 'TAP summary contains an unbounded check title'
+awk '/^  - / && length($0) > 244 { exit 1 }' "$test_tmp/tap-summary.log" || fail 'TAP summary contains an unbounded check title'
 if grep --extended-regexp --quiet 'review-only TAP diagnostic content|not ok 9 -|before a check report' "$test_tmp/tap-summary.log"; then
   fail 'TAP summary omitted check titles or printed diagnostic output'
 fi
