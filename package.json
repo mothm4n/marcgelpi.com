@@ -3,10 +3,15 @@
   "private": true,
   "scripts": {
     "test": "npm run test:workflow && npm run test:acceptance",
+    "test:agent": "bash scripts/test-agent.sh",
     "test:workflow": "bash tests/workflow/run.sh",
     "test:acceptance": "bash tests/acceptance/run.sh",
     "browser:install-headed": "playwright install chromium",
-    "browser:open-headed": "playwright open"
+    "browser:open-headed": "playwright open",
+    "release:prepare": "node scripts/prepare-release.js",
+    "test:release-preparation": "node --test tests/release/prepare-release.test.js",
+    "release:publish": "node scripts/publish-release.js",
+    "test:release-publication": "node --test tests/release/publish-release.test.js"
   },
   "devDependencies": {
     "axe-core": "4.13.0",

@@ -1,5 +1,7 @@
 # Publication performance budget
 
+Publication performance changes must preserve the [approval requirements](../docs/publication-workflow.md#3-record-approval) and [production verification procedure](../docs/publication-workflow.md#4-verify-the-production-boundary) in the publication workflow.
+
 Publication time is measured from the first build-job timing step immediately before checkout through completed GitHub Pages deployment. Each phase records integer wall-clock seconds immediately before and after the existing command or action. Acceptance reports the same measurement per journey. A Hugo build is one Hugo invocation counted when it starts, including fixture-specific builds that later fail as expected.
 
 The reviewed baseline is **10:19 total**, including **9:15 acceptance**. The target is **below 3:00** total publication time, measured the same way across five representative successful GitHub Actions runs.
@@ -32,3 +34,9 @@ Issue #39 tested persisting Hugo's file cache with a key containing the runner o
 All four runs passed the complete acceptance suite with 28 Hugo invocations, production build, release verification, artifact upload, and deployment. The cold and warm production artifacts had the same content digest, `e33452b13d7719f97057c26f5b7af6ecf1251f76d1405204d21f21e0cac80c7c`.
 
 The median warm improvement was **-460.1%**, below the required 10% gain. Acceptance already warms Hugo's temporary cache before the final production build, so restoring the small persistent cache added more time than it saved. The persistence experiment was therefore removed; CI retains Hugo's per-run temporary cache without adding restore or save actions.
+
+## Hourly publication check
+
+An unchanged scheduled run uses the runner's existing Node runtime and read-only GitHub API calls to compare content eligibility with the last successful Pages deployment. It skips Hugo installation, browser dependencies, acceptance, and deployment. Push and manual runs still execute every release gate. The hourly decision runs in a separate concurrency group and dispatches the complete publication workflow on current `master` only when needed. Its job has Actions write permission for that dispatch; it has no Pages or OIDC write permission.
+
+A successful release captures publication state with two counted Hugo list invocations at the canonical artifact's fixed build time. The state contains dates and opaque identifiers, excludes drafts, and is preserved only after Pages deployment succeeds. Timing reports include capture and preservation as separate phases. No build or dependency cache is added. Missing or unusable state takes the full release path. See [the scheduling procedure](../docs/publication-workflow.md#6-schedule-an-approved-article).
