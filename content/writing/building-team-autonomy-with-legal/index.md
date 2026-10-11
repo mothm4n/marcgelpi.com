@@ -58,3 +58,5 @@ We kept turning what we learned into shared criteria and preapprovals. **Legal r
 This was part of the [protected-autonomy pilot](/work/protected-autonomy/). The **under-24-hour** result concerned some campaigns within that protected scope.
 
 For your next recurring approval, ask the expert what the team could recognise earlier, which conditions would allow a preapproval, and when it should return for review. Does each review leave the team better equipped for the next decision?
+
+If repeated approvals are slowing your team, [let's talk](/contact/) about one decision that keeps coming back.

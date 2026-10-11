@@ -56,6 +56,8 @@ The director responsible for that outcome decides, records the trade-off and set
 
 Managing demand turns separate requests into work we can commit to doing.
 
+In our [work across Adevinta](/work/adevinta/), quarterly alignment helped surface dependencies and coordinate cross-border workstreams. That work depended on leaders, managers, coaches and teams across the group.
+
 For the next contested priority:
 
 1. Agree which shared outcome guides the choice.
@@ -65,3 +67,5 @@ For the next contested priority:
 5. Record what will happen, what will wait and what evidence would justify revisiting the decision.
 
 Alignment needs a shared intent that makes cooperation worthwhile and a choice people can act on.
+
+If your teams keep competing for the same capacity, [let's talk](/contact/) about the choice they need to make together.

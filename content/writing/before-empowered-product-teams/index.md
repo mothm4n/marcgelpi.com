@@ -56,4 +56,8 @@ In the exercise I use, we structure that conversation like this:
 
 The board records the agreement. People need to sustain it. Check whether the recipient could exercise that power and whether the giver respected the decision.
 
+The [protected-autonomy pilot](/work/protected-autonomy/) shows how scoped decision boundaries can give a team room to act within a hierarchy.
+
 Before asking for more autonomy, agree which decision one side is willing to release and the other to accept.
+
+If an ownership agreement still leaves people asking permission, [let's talk](/contact/) about who can make that decision.

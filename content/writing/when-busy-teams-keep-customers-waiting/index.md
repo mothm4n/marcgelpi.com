@@ -50,4 +50,8 @@ At DWP, a [later assessment](https://www.gov.uk/service-standard-reports/apply-f
 
 Check the whole journey: the user's wait, errors and the effort required to resolve the request. Keep the same start and finish when comparing. A before-and-after improvement can guide learning without proving causation by itself.
 
+The [Adevinta case](/work/adevinta/) includes a Kanban pilot in Talent Acquisition, alongside work on cross-team coordination.
+
 Before improving a handoff between teams, ask what the person receiving value actually needs.
+
+If people are waiting between your teams, [let's talk](/contact/) about one request and the outcome its recipient needs.

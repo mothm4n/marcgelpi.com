@@ -77,6 +77,8 @@ That describes continuity of work during that early period. Assessing customer v
 
 Sine and colleagues found a positive association between formalised roles in founding teams and revenue in young internet-service firms. The study was observational. It cannot tell you which agreement your company needs. [Sine et al., 2006](https://courses.umass.edu/marta/schmgmt802-marta/RevisitingBurns%26Stalker2006AMJ.pdf).
 
+In a separate [fintech engagement](/work/preparing-to-scale/), we worked with company leaders, teams and external collaborators on a lightweight product operating model and coordination across locations.
+
 To try this in your own team, choose one recurring interruption. Write a short agreement that answers three questions:
 
 - Which decision can each person make?
@@ -84,3 +86,5 @@ To try this in your own team, choose one recurring interruption. Write a short a
 - How will you revise the agreement when new evidence changes the decision?
 
 Set a review date. At that review, check whether the agreement reduces the original confusion. Simplify or remove it if it no longer helps.
+
+If growth is making decision authority harder to read, [let's talk](/contact/) about where the confusion starts.
