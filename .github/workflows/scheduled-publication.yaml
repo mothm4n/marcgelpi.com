@@ -2,9 +2,10 @@ name: Check scheduled publication
 
 on:
   schedule:
-    # Check hourly so approved articles appear after their publication date.
+    # Check after the usual morning publication time.
     # Avoid the start of the hour, when scheduled Actions are busiest.
-    - cron: '17 * * * *'
+    - cron: '17 9 * * *'
+      timezone: 'Europe/Madrid'
 
 permissions:
   contents: read

@@ -51,7 +51,7 @@ function decide(state, clock = before, event = 'schedule', sha = commit, extra =
   return JSON.parse(result.stdout);
 }
 
-test('an unchanged hourly run skips while an approved article is still future', t => {
+test('an unchanged scheduled run skips while an approved article is still future', t => {
   const { root, state } = fixture(t);
   assert.equal(published(root, before).includes('content/scheduled.md'), false);
   assert.deepEqual(decide(state), {
@@ -76,7 +76,7 @@ test('a newly due approved article requests publication and reports the decision
   assert.match(fs.readFileSync(summary, 'utf8'), /Publishable content changed since the last successful deployment\./);
 });
 
-test('a missed or failed hourly attempt leaves overdue content pending against the last success', t => {
+test('a missed or failed scheduled attempt leaves overdue content pending against the last success', t => {
   const { root, state } = fixture(t);
   const lastSuccess = fs.readFileSync(state, 'utf8');
   const later = '2030-06-03T07:30:00Z';
@@ -168,7 +168,7 @@ Expiry.
   assert.equal(recorded.includes('content/'), false);
 });
 
-test('hourly lookup compares with the last successful Pages deployment, never a newer failed run', async t => {
+test('scheduled lookup compares with the last successful Pages deployment, never a newer failed run', async t => {
   const { root, state } = fixture(t);
   const archive = path.join(root, 'success.zip');
   fs.copyFileSync(state, path.join(root, 'publication-state.json'));
