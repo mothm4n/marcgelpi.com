@@ -32,12 +32,13 @@ contains 'name: github-pages' "$workflow"
 contains 'name: Deploy to GitHub Pages' "$workflow"
 contains 'name: publication-success-state' "$workflow"
 if grep --quiet -E 'schedule:|scheduled-publication.js decide|needs: preflight' "$workflow"; then
-  fail "hourly decisions must not be admitted to full-publication concurrency"
+  fail "scheduled decisions must not be admitted to full-publication concurrency"
 fi
 
-[[ -f "$schedule" ]] || fail "the hourly decision workflow is missing"
+[[ -f "$schedule" ]] || fail "the scheduled decision workflow is missing"
 contains 'schedule:' "$schedule"
-contains "cron: '17 * * * *'" "$schedule"
+contains "cron: '17 9 * * *'" "$schedule"
+contains "timezone: 'Europe/Madrid'" "$schedule"
 contains 'group: scheduled-publication-check' "$schedule"
 contains 'actions: write' "$schedule"
 contains 'deployments: read' "$schedule"
